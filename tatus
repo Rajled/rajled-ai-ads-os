@@ -1,0 +1,71 @@
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/README.md b/README.md[m
+[1mindex 7992bb6..1d39dd7 100644[m
+[1m--- a/README.md[m
+[1m+++ b/README.md[m
+[36m@@ -49,11 +49,11 @@[m [mThe system follows the engineering principle:[m
+ [m
+ Current release:[m
+ [m
+[31m-**v0.1.0 Foundation**[m
+[32m+[m[32m**v0.1.0-alpha.1 Core Framework**[m
+ [m
+ Current milestone:[m
+ [m
+[31m-**M0 – Repository Setup**[m
+[32m+[m[32m**M1 - Foundation Platform**[m
+ [m
+ Current sprint:[m
+ [m
+[36m@@ -65,8 +65,10 @@[m [mCurrent implementation phase:[m
+ * Documentation Suite established[m
+ * Repository initialization[m
+ * Engineering standards preparation[m
+[32m+[m[32m* WordPress plugin foundation created[m
+[32m+[m[32m* REST and dashboard foundation created[m
+ [m
+[31m-Implementation of business functionality has not started yet.[m
+[32m+[m[32mImplementation of advertising business functionality has not started yet.[m
+ [m
+ ---[m
+ [m
+[36m@@ -130,7 +132,7 @@[m [mThe project follows several fundamental principles.[m
+ [m
+ Detailed engineering rules are defined in:[m
+ [m
+[31m-`ENGINEERING_STANDARD.md`[m
+[32m+[m[32m`ENGINEERING_STANDARDS.md`[m
+ [m
+ ---[m
+ [m
+[36m@@ -160,12 +162,20 @@[m [mCode is never considered complete until the corresponding documentation has been[m
+ ```text[m
+ documentation/[m
+ src/[m
+[32m+[m[32m  Core/[m
+[32m+[m[32m  Config/[m
+[32m+[m[32m  Dashboard/[m
+[32m+[m[32m  Engine/[m
+[32m+[m[32m  Health/[m
+[32m+[m[32m  Logging/[m
+[32m+[m[32m  Rest/[m
+ tests/[m
+ vendor/[m
+ [m
+[32m+[m[32mrajled-ai-ads-os.php[m
+ README.md[m
+ AGENTS.md[m
+[31m-ENGINEERING_STANDARD.md[m
+[32m+[m[32mENGINEERING_STANDARDS.md[m
+ CONTRIBUTING.md[m
+ ROADMAP.md[m
+ CHANGELOG.md[m
+[36m@@ -248,7 +258,7 @@[m [mAI is considered an engineering assistant.[m
+ Every AI agent contributing to this repository must follow:[m
+ [m
+ * AGENTS.md[m
+[31m-* ENGINEERING_STANDARD.md[m
+[32m+[m[32m* ENGINEERING_STANDARDS.md[m
+ [m
+ Generated code must comply with project architecture and engineering rules.[m
+ [m

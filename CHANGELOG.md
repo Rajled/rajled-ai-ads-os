@@ -34,24 +34,24 @@ Not every release will contain every section.
 
 # [Unreleased]
 
-## Planned
-
-### Sprint
+## Sprint
 
 Current Sprint:
 
 **Sprint 1 — Foundation**
 
-### Planned Features
+## Added
 
-* Core Framework
-* Kernel
-* Engine Registry
-* Configuration Manager
-* Logger
-* Health Manager
-* REST Foundation
-* Dashboard Foundation
+* WordPress plugin bootstrap for v0.1.0-alpha.1.
+* Kernel service initialization.
+* EngineInterface and EngineRegistry foundation.
+* ConfigurationManager, Logger and HealthManager services.
+* REST endpoints for health and version checks.
+* WordPress admin dashboard placeholder.
+
+## Sprint
+
+* S1-001 Core Framework
 
 ---
 

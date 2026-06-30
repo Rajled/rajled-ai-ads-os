@@ -49,11 +49,11 @@ The system follows the engineering principle:
 
 Current release:
 
-**v0.1.0 Foundation**
+**v0.1.0-alpha.1 Core Framework**
 
 Current milestone:
 
-**M0 – Repository Setup**
+**M1 - Foundation Platform**
 
 Current sprint:
 
@@ -65,8 +65,10 @@ Current implementation phase:
 * Documentation Suite established
 * Repository initialization
 * Engineering standards preparation
+* WordPress plugin foundation created
+* REST and dashboard foundation created
 
-Implementation of business functionality has not started yet.
+Implementation of advertising business functionality has not started yet.
 
 ---
 
@@ -130,7 +132,7 @@ The project follows several fundamental principles.
 
 Detailed engineering rules are defined in:
 
-`ENGINEERING_STANDARD.md`
+`ENGINEERING_STANDARDS.md`
 
 ---
 
@@ -160,12 +162,20 @@ Code is never considered complete until the corresponding documentation has been
 ```text
 documentation/
 src/
+  Core/
+  Config/
+  Dashboard/
+  Engine/
+  Health/
+  Logging/
+  Rest/
 tests/
 vendor/
 
+rajled-ai-ads-os.php
 README.md
 AGENTS.md
-ENGINEERING_STANDARD.md
+ENGINEERING_STANDARDS.md
 CONTRIBUTING.md
 ROADMAP.md
 CHANGELOG.md
@@ -212,11 +222,14 @@ Current technology stack:
 * PHP 8.x
 * WordPress
 * Composer
-* Google Ads API
 * REST API
 * Git
 * GitHub
 * Codex-assisted development
+
+Planned Technology Stack: 
+
+* Google Ads API (planned)
 
 Future integrations may include:
 
@@ -248,7 +261,7 @@ AI is considered an engineering assistant.
 Every AI agent contributing to this repository must follow:
 
 * AGENTS.md
-* ENGINEERING_STANDARD.md
+* ENGINEERING_STANDARDS.md
 
 Generated code must comply with project architecture and engineering rules.
 
