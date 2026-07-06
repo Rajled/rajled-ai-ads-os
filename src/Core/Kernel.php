@@ -21,34 +21,16 @@ use Rajled\AiAdsOs\Rest\RestController;
  */
 final class Kernel
 {
-    private ConfigurationManager $configuration;
+    private ServiceContainer $container;
 
-    private EngineRegistry $engineRegistry;
-
-    private Logger $logger;
-
-    private HealthManager $healthManager;
-
-    private RestController $restController;
-
-    private DashboardPage $dashboardPage;
+    private ProviderRegistry $providerRegistry;
 
     private bool $booted = false;
 
-    private function __construct(
-        ConfigurationManager $configuration,
-        EngineRegistry $engineRegistry,
-        Logger $logger,
-        HealthManager $healthManager,
-        RestController $restController,
-        DashboardPage $dashboardPage
-    ) {
-        $this->configuration = $configuration;
-        $this->engineRegistry = $engineRegistry;
-        $this->logger = $logger;
-        $this->healthManager = $healthManager;
-        $this->restController = $restController;
-        $this->dashboardPage = $dashboardPage;
+    private function __construct(ServiceContainer $container, ProviderRegistry $providerRegistry)
+    {
+        $this->container = $container;
+        $this->providerRegistry = $providerRegistry;
     }
 
     /**
@@ -58,19 +40,15 @@ final class Kernel
      */
     public static function create(array $configurationValues): self
     {
-        $configuration = new ConfigurationManager($configurationValues);
-        $engineRegistry = new EngineRegistry();
-        $logger = new Logger();
-        $healthManager = new HealthManager($configuration, $engineRegistry);
+        $container = new ServiceContainer();
+        $providerRegistry = new ProviderRegistry();
+        $providerRegistry->register(new CoreServiceProvider($configurationValues));
+        $providerRegistry->boot($container);
 
-        return new self(
-            $configuration,
-            $engineRegistry,
-            $logger,
-            $healthManager,
-            new RestController($configuration, $healthManager),
-            new DashboardPage($configuration, $healthManager)
-        );
+        $kernel = new self($container, $providerRegistry);
+        $kernel->registerWordPressAdapters();
+
+        return $kernel;
     }
 
     /**
@@ -82,14 +60,19 @@ final class Kernel
             return;
         }
 
-        add_action('rest_api_init', array($this->restController, 'registerRoutes'));
-        add_action('admin_menu', array($this->dashboardPage, 'registerMenu'));
+        $restController = $this->container->get(RestController::class);
+        $dashboardPage = $this->container->get(DashboardPage::class);
+        $configuration = $this->container->get(ConfigurationManager::class);
+        $logger = $this->container->get(Logger::class);
 
-        $this->logger->info(
+        add_action('rest_api_init', array($restController, 'registerRoutes'));
+        add_action('admin_menu', array($dashboardPage, 'registerMenu'));
+
+        $logger->info(
             'Kernel booted.',
             array(
                 'version'        => $this->getVersion(),
-                'rest_namespace' => $this->configuration->getRestNamespace(),
+                'rest_namespace' => $configuration->getRestNamespace(),
             )
         );
 
@@ -98,21 +81,54 @@ final class Kernel
 
     public function getVersion(): string
     {
-        return $this->configuration->getVersion();
+        return $this->getConfiguration()->getVersion();
     }
 
     public function getConfiguration(): ConfigurationManager
     {
-        return $this->configuration;
+        return $this->container->get(ConfigurationManager::class);
     }
 
     public function getEngineRegistry(): EngineRegistry
     {
-        return $this->engineRegistry;
+        return $this->container->get(EngineRegistry::class);
     }
 
     public function getHealthManager(): HealthManager
     {
-        return $this->healthManager;
+        return $this->container->get(HealthManager::class);
+    }
+
+    public function getContainer(): ServiceContainer
+    {
+        return $this->container;
+    }
+
+    public function getProviderRegistry(): ProviderRegistry
+    {
+        return $this->providerRegistry;
+    }
+
+    private function registerWordPressAdapters(): void
+    {
+        $this->container->singleton(
+            RestController::class,
+            static function (ServiceContainer $container): RestController {
+                return new RestController(
+                    $container->get(ConfigurationManager::class),
+                    $container->get(HealthManager::class)
+                );
+            }
+        );
+
+        $this->container->singleton(
+            DashboardPage::class,
+            static function (ServiceContainer $container): DashboardPage {
+                return new DashboardPage(
+                    $container->get(ConfigurationManager::class),
+                    $container->get(HealthManager::class)
+                );
+            }
+        );
     }
 }

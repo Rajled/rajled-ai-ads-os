@@ -2,7 +2,7 @@
 
 > **AI-powered Digital Advertising Operations Platform**
 
-**Version:** 0.1.0 (Foundation)
+**Version:** 0.2.0-alpha.1 (Infrastructure Layer)
 **Status:** In Development
 **Repository Type:** Private
 **License:** Proprietary (RajLED)
@@ -49,7 +49,7 @@ The system follows the engineering principle:
 
 Current release:
 
-**v0.1.0-alpha.1 Core Framework**
+**v0.2.0-alpha.1 Infrastructure Layer**
 
 Current milestone:
 
@@ -67,6 +67,8 @@ Current implementation phase:
 * Engineering standards preparation
 * WordPress plugin foundation created
 * REST and dashboard foundation created
+* Infrastructure service container created
+* Internal event dispatcher created
 
 Implementation of advertising business functionality has not started yet.
 
@@ -251,6 +253,24 @@ The project follows:
 * Architecture Decision Records (ADR)
 * Documentation Review
 * Incremental Releases
+
+---
+
+# Infrastructure Layer
+
+The infrastructure layer provides dependency management for the WordPress plugin foundation.
+
+Current infrastructure services:
+
+* ServiceContainer
+* ServiceProviderInterface
+* ProviderRegistry
+* CoreServiceProvider
+* EventDispatcher
+
+Core services are registered through service providers and resolved through the ServiceContainer.
+
+The Kernel is responsible for loading providers and connecting WordPress adapters such as REST endpoints and the admin dashboard.
 
 ---
 

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: RajLED AI Ads OS
  * Description: Core framework for the RajLED AI Ads OS platform.
- * Version: 0.1.0-alpha.1
+ * Version: 0.2.0-alpha.1
  * Author: RajLED
  * Text Domain: rajled-ai-ads-os
  * Requires PHP: 8.0
@@ -18,7 +18,7 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
-define('RAJLED_AI_ADS_OS_VERSION', '0.1.0-alpha.1');
+define('RAJLED_AI_ADS_OS_VERSION', '0.2.0-alpha.1');
 define('RAJLED_AI_ADS_OS_FILE', __FILE__);
 define('RAJLED_AI_ADS_OS_PATH', plugin_dir_path(__FILE__));
 define('RAJLED_AI_ADS_OS_URL', plugin_dir_url(__FILE__));
