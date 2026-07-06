@@ -270,4 +270,18 @@ These documents collectively define the project.
 
 ---
 
+## Additional Engineering Rules
+
+### Refactoring
+
+Before changing an existing class, prefer refactoring over rewriting.
+
+Preserve public behavior unless the sprint explicitly requires a breaking change.
+
+### Versioning
+
+Version numbers become official only after sprint acceptance, merge to main and tagging.
+
+---
+
 **End of document**

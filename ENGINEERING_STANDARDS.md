@@ -187,3 +187,14 @@ Every completed project may improve these standards.
 Lessons learned become new standards.
 
 The engineering process evolves together with the software.
+
+
+## Review Workflow
+
+Every sprint must follow the review process:
+
+1. Architecture Review
+2. Documentation Review
+3. Code Review
+4. Acceptance Tests
+5. Release
