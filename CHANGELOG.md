@@ -48,10 +48,15 @@ Current Sprint:
 * ConfigurationManager, Logger and HealthManager services.
 * REST endpoints for health and version checks.
 * WordPress admin dashboard placeholder.
+* ServiceContainer with singleton and lazy service resolution.
+* ServiceProviderInterface, ProviderRegistry and CoreServiceProvider.
+* Internal EventDispatcher for application events.
+* Plugin version updated to v0.2.0-alpha.1.
 
 ## Sprint
 
 * S1-001 Core Framework
+* S1-002 Infrastructure Layer
 
 ---
 

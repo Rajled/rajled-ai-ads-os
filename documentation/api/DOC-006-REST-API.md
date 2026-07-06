@@ -1,7 +1,7 @@
 # DOC-006 REST API Specification
 
 **Project:** RajLED AI Ads OS
-**Version:** 0.1.0-alpha.1
+**Version:** 0.2.0-alpha.1
 **Status:** Initial
 
 ---
@@ -62,7 +62,7 @@ Response data:
 ```json
 {
   "status": "ok",
-  "version": "0.1.0-alpha.1",
+  "version": "0.2.0-alpha.1",
   "engines": 0
 }
 ```
@@ -75,7 +75,7 @@ Response data:
 
 ```json
 {
-  "version": "0.1.0-alpha.1"
+  "version": "0.2.0-alpha.1"
 }
 ```
 
@@ -88,6 +88,10 @@ The S1-001 health and version endpoints are public read endpoints.
 They expose only framework status and version metadata.
 
 Version History
+
+0.2.0-alpha.1
+
+Infrastructure layer release. Endpoint contract unchanged.
 
 0.1.0-alpha.1
 
