@@ -9,20 +9,16 @@ declare(strict_types=1);
 
 namespace Rajled\AiAdsOs\Integration\GoogleAds;
 
+use Rajled\AiAdsOs\Integration\IntegrationProviderInterface;
+
 /**
  * Reports Google Ads connection readiness.
  */
-interface ConnectionInterface
+interface ConnectionInterface extends IntegrationProviderInterface
 {
     public const STATUS_CONFIGURED = 'configured';
 
     public const STATUS_NOT_CONFIGURED = 'not_configured';
-
-    public function getProviderName(): string;
-
-    public function getStatus(): string;
-
-    public function isConfigured(): bool;
 
     /**
      * Return missing credential keys.

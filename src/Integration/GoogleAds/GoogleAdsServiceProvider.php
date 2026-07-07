@@ -12,6 +12,7 @@ namespace Rajled\AiAdsOs\Integration\GoogleAds;
 use Rajled\AiAdsOs\Config\ConfigurationManager;
 use Rajled\AiAdsOs\Core\ServiceContainer;
 use Rajled\AiAdsOs\Core\ServiceProviderInterface;
+use Rajled\AiAdsOs\Integration\IntegrationRegistry;
 
 /**
  * Registers Google Ads integration layer services.
@@ -63,5 +64,11 @@ final class GoogleAdsServiceProvider implements ServiceProviderInterface
                 return $container->get(ConnectionManager::class);
             }
         );
+
+        if ($container->has(IntegrationRegistry::class)) {
+            $container->get(IntegrationRegistry::class)->register(
+                $container->get(ConnectionInterface::class)
+            );
+        }
     }
 }

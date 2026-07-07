@@ -12,7 +12,7 @@ This document describes the REST API surface implemented for the foundation plat
 
 This version exposes framework health and version endpoints.
 
-S1-003 extends the health payload with Google Ads integration readiness only. It does not expose Google Ads campaign data or execute live Google Ads API requests.
+S1-003 extends the health payload with Google Ads integration readiness only. Integration readiness is provided through the IntegrationRegistry. It does not expose Google Ads campaign data or execute live Google Ads API requests.
 
 Out of scope:
 
@@ -104,6 +104,8 @@ Version History
 Unreleased
 
 S1-003 Google Ads Integration Foundation. Health response includes Google Ads readiness status.
+
+S1-003 TASK-003.2 Integration Provider Framework. Health response shape is unchanged and provider readiness is resolved through IntegrationRegistry.
 
 0.2.0-alpha.1
 

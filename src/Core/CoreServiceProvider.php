@@ -12,7 +12,7 @@ namespace Rajled\AiAdsOs\Core;
 use Rajled\AiAdsOs\Config\ConfigurationManager;
 use Rajled\AiAdsOs\Engine\EngineRegistry;
 use Rajled\AiAdsOs\Health\HealthManager;
-use Rajled\AiAdsOs\Integration\GoogleAds\ConnectionInterface;
+use Rajled\AiAdsOs\Integration\IntegrationRegistry;
 use Rajled\AiAdsOs\Logging\Logger;
 
 /**
@@ -66,18 +66,19 @@ final class CoreServiceProvider implements ServiceProviderInterface
         );
 
         $container->singleton(
+            IntegrationRegistry::class,
+            static function (): IntegrationRegistry {
+                return new IntegrationRegistry();
+            }
+        );
+
+        $container->singleton(
             HealthManager::class,
             static function (ServiceContainer $container): HealthManager {
-                $googleAdsConnection = null;
-
-                if ($container->has(ConnectionInterface::class)) {
-                    $googleAdsConnection = $container->get(ConnectionInterface::class);
-                }
-
                 return new HealthManager(
                     $container->get(ConfigurationManager::class),
                     $container->get(EngineRegistry::class),
-                    $googleAdsConnection
+                    $container->get(IntegrationRegistry::class)
                 );
             }
         );

@@ -53,6 +53,20 @@ final class ConnectionManager implements ConnectionInterface
         return $this->credentialsManager->getMissingCredentialKeys();
     }
 
+    /**
+     * Return Google Ads integration health status.
+     *
+     * @return array{status: string, configured: bool, missing_credentials: array<int, string>}
+     */
+    public function getHealthStatus(): array
+    {
+        return array(
+            'status'              => $this->getStatus(),
+            'configured'          => $this->isConfigured(),
+            'missing_credentials' => $this->getMissingCredentialKeys(),
+        );
+    }
+
     public function getClient(): ?ClientInterface
     {
         return $this->clientFactory->create();

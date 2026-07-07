@@ -11,7 +11,8 @@ namespace Rajled\AiAdsOs\Health;
 
 use Rajled\AiAdsOs\Config\ConfigurationManager;
 use Rajled\AiAdsOs\Engine\EngineRegistry;
-use Rajled\AiAdsOs\Integration\GoogleAds\ConnectionInterface;
+use Rajled\AiAdsOs\Integration\IntegrationProviderInterface;
+use Rajled\AiAdsOs\Integration\IntegrationRegistry;
 
 /**
  * Provides the current system health status.
@@ -22,61 +23,62 @@ final class HealthManager
 
     private EngineRegistry $engineRegistry;
 
-    private ?ConnectionInterface $googleAdsConnection;
+    private ?IntegrationRegistry $integrationRegistry;
 
     public function __construct(
         ConfigurationManager $configuration,
         EngineRegistry $engineRegistry,
-        ?ConnectionInterface $googleAdsConnection = null
+        IntegrationRegistry|IntegrationProviderInterface|null $integrations = null
     ) {
         $this->configuration = $configuration;
         $this->engineRegistry = $engineRegistry;
-        $this->googleAdsConnection = $googleAdsConnection;
+        $this->integrationRegistry = $this->resolveIntegrationRegistry($integrations);
     }
 
     /**
      * Return basic system status.
      *
-     * @return array{
-     *     status: string,
-     *     version: string,
-     *     engines: int,
-     *     google_ads: array{
-     *         status: string,
-     *         configured: bool,
-     *         missing_credentials: array<int, string>
-     *     }
-     * }
+     * @return array<string, mixed>
      */
     public function getStatus(): array
     {
-        return array(
+        $status = array(
             'status'     => 'ok',
             'version'    => $this->configuration->getVersion(),
             'engines'    => $this->engineRegistry->count(),
-            'google_ads' => $this->getGoogleAdsStatus(),
         );
+
+        return array_merge($status, $this->getIntegrationStatuses());
     }
 
     /**
-     * Return Google Ads integration status.
+     * Return registered integration provider statuses.
      *
-     * @return array{status: string, configured: bool, missing_credentials: array<int, string>}
+     * @return array<string, array<string, mixed>>
      */
-    private function getGoogleAdsStatus(): array
+    private function getIntegrationStatuses(): array
     {
-        if (null === $this->googleAdsConnection) {
-            return array(
-                'status'              => 'unavailable',
-                'configured'          => false,
-                'missing_credentials' => array(),
-            );
+        if (null === $this->integrationRegistry) {
+            return array();
         }
 
-        return array(
-            'status'              => $this->googleAdsConnection->getStatus(),
-            'configured'          => $this->googleAdsConnection->isConfigured(),
-            'missing_credentials' => $this->googleAdsConnection->getMissingCredentialKeys(),
-        );
+        return $this->integrationRegistry->getHealthStatuses();
+    }
+
+    private function resolveIntegrationRegistry(
+        IntegrationRegistry|IntegrationProviderInterface|null $integrations
+    ): ?IntegrationRegistry {
+        if (null === $integrations) {
+            return null;
+        }
+
+        if ($integrations instanceof IntegrationRegistry) {
+            return $integrations;
+        }
+
+        $registry = new IntegrationRegistry();
+        $registry->register($integrations);
+
+        return $registry;
     }
 }

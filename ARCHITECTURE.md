@@ -117,6 +117,8 @@ Future providers may include:
 
 Business engines never communicate directly with external APIs.
 
+Integration providers are registered through a shared IntegrationRegistry. Provider-specific integrations expose readiness through IntegrationProviderInterface so application services can report integration health without depending on individual providers.
+
 The current Google Ads Integration Layer foundation does not perform live API requests, GAQL queries or campaign fetching. It prepares provider-specific services that future sprints can use behind integration-layer contracts.
 
 ---

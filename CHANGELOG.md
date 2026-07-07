@@ -54,6 +54,7 @@ Current Sprint:
 * Plugin version updated to v0.2.0-alpha.1.
 * Google Ads Integration Foundation services for configuration, credentials, client creation and connection readiness.
 * Health status now reports Google Ads readiness under the `google_ads` key without exposing credential values.
+* IntegrationProviderInterface and IntegrationRegistry for provider-independent integration health registration.
 
 ## Sprint
 
