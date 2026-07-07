@@ -8,13 +8,15 @@
 
 # Scope
 
-This document describes the REST API surface implemented for S1-001 Core Framework.
+This document describes the REST API surface implemented for the foundation platform.
 
-This version only exposes framework health and version endpoints.
+This version exposes framework health and version endpoints.
+
+S1-003 extends the health payload with Google Ads integration readiness only. It does not expose Google Ads campaign data or execute live Google Ads API requests.
 
 Out of scope:
 
-* Google Ads API integration
+* Google Ads campaign data endpoints
 * Snapshot Engine
 * Campaign Memory
 * business recommendations
@@ -63,7 +65,17 @@ Response data:
 {
   "status": "ok",
   "version": "0.2.0-alpha.1",
-  "engines": 0
+  "engines": 0,
+  "google_ads": {
+    "status": "not_configured",
+    "configured": false,
+    "missing_credentials": [
+      "developer_token",
+      "client_id",
+      "client_secret",
+      "refresh_token"
+    ]
+  }
 }
 ```
 
@@ -88,6 +100,10 @@ The S1-001 health and version endpoints are public read endpoints.
 They expose only framework status and version metadata.
 
 Version History
+
+Unreleased
+
+S1-003 Google Ads Integration Foundation. Health response includes Google Ads readiness status.
 
 0.2.0-alpha.1
 

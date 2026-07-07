@@ -106,7 +106,7 @@ Responsible for communication with external providers.
 
 Current provider:
 
-* Google Ads
+* Google Ads - configuration, credentials, client and connection readiness foundation
 
 Future providers may include:
 
@@ -116,6 +116,8 @@ Future providers may include:
 * LinkedIn Ads
 
 Business engines never communicate directly with external APIs.
+
+The current Google Ads Integration Layer foundation does not perform live API requests, GAQL queries or campaign fetching. It prepares provider-specific services that future sprints can use behind integration-layer contracts.
 
 ---
 

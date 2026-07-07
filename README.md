@@ -69,8 +69,9 @@ Current implementation phase:
 * REST and dashboard foundation created
 * Infrastructure service container created
 * Internal event dispatcher created
+* Google Ads Integration Layer foundation created
 
-Implementation of advertising business functionality has not started yet.
+Implementation of advertising business functionality has not started yet. The current Google Ads work is limited to integration-layer configuration and readiness status.
 
 ---
 
@@ -169,6 +170,7 @@ src/
   Dashboard/
   Engine/
   Health/
+  Integration/
   Logging/
   Rest/
 tests/
@@ -268,9 +270,19 @@ Current infrastructure services:
 * CoreServiceProvider
 * EventDispatcher
 
+Google Ads Integration Layer foundation services:
+
+* GoogleAdsConfiguration
+* CredentialsManager
+* ClientInterface
+* ClientFactory
+* ConnectionInterface
+* ConnectionManager
+* GoogleAdsServiceProvider
+
 Core services are registered through service providers and resolved through the ServiceContainer.
 
-The Kernel is responsible for loading providers and connecting WordPress adapters such as REST endpoints and the admin dashboard.
+The Kernel is responsible for loading providers and connecting WordPress adapters such as REST endpoints and the admin dashboard. The Google Ads foundation reports readiness only; it does not fetch campaigns or call the Google Ads API.
 
 ---
 

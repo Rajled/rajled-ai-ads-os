@@ -52,11 +52,14 @@ Current Sprint:
 * ServiceProviderInterface, ProviderRegistry and CoreServiceProvider.
 * Internal EventDispatcher for application events.
 * Plugin version updated to v0.2.0-alpha.1.
+* Google Ads Integration Foundation services for configuration, credentials, client creation and connection readiness.
+* Health status now reports Google Ads readiness under the `google_ads` key without exposing credential values.
 
 ## Sprint
 
 * S1-001 Core Framework
 * S1-002 Infrastructure Layer
+* S1-003 Google Ads Integration Foundation
 
 ---
 

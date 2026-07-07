@@ -13,6 +13,7 @@ use Rajled\AiAdsOs\Config\ConfigurationManager;
 use Rajled\AiAdsOs\Dashboard\DashboardPage;
 use Rajled\AiAdsOs\Engine\EngineRegistry;
 use Rajled\AiAdsOs\Health\HealthManager;
+use Rajled\AiAdsOs\Integration\GoogleAds\GoogleAdsServiceProvider;
 use Rajled\AiAdsOs\Logging\Logger;
 use Rajled\AiAdsOs\Rest\RestController;
 
@@ -43,6 +44,7 @@ final class Kernel
         $container = new ServiceContainer();
         $providerRegistry = new ProviderRegistry();
         $providerRegistry->register(new CoreServiceProvider($configurationValues));
+        $providerRegistry->register(new GoogleAdsServiceProvider());
         $providerRegistry->boot($container);
 
         $kernel = new self($container, $providerRegistry);
