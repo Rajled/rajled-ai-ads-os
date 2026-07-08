@@ -1,5 +1,9 @@
 # ARCHITECTURE.md
 
+> This document serves as the master architecture specification for RajLED AI Ads OS.
+>
+> Detailed technical specifications are maintained in the documentation/architecture directory.
+
 # Architecture Overview
 
 **Project:** RajLED AI Ads OS

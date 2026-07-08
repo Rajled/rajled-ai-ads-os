@@ -225,4 +225,38 @@ Sprint S1-003 / TASK-003.2
 
 Separate service registration from runtime provider registration.
 
+
+### AB-006 — Ubiquitous Language Specification
+
+**Status:** Planned
+
+**Priority:** Medium
+
+**Description**
+
+Introduce a dedicated architecture document describing the ubiquitous language of RajLED AI Ads OS.
+
+The document will define business terminology shared across Domain, Engine, AI and Integration layers, ensuring consistent interpretation of concepts independently from external providers.
+
+**Target Milestone**
+
+S1-005 or S1-006 (after the initial Domain Model has stabilized).
+
+### AB-007 — Decision Object
+
+**Status:** Planned
+
+**Priority:** High
+
+**Description**
+
+Introduce a dedicated Decision domain object representing the outcome of business evaluation performed by Decision Engines.
+
+The Decision object will become the central contract between the Engine Layer and downstream consumers such as Recommendation Engines, Presentation Layer and AI components.
+
+**Target Milestone**
+
+S1-006 or later (after the initial Engine Framework has stabilized).
+
+
 ...

@@ -47,6 +47,21 @@ Architecture documents are version-controlled.
 
 Documentation participates in code review.
 
+
+## Documentation Stability
+
+The project documentation structure is considered stable.
+
+New documentation files should not be introduced unless an existing document can no longer adequately describe the architecture or implementation.
+
+Before creating a new document:
+
+- extend an existing document whenever possible;
+- consider recording future ideas in `ARCHITECTURE_BACKLOG.md`;
+- create a new document only when it becomes a long-term architectural asset.
+
+The preferred approach is to keep the documentation compact, maintainable and closely aligned with the implemented system.
+
 ---
 
 # RES-003 — Domain Before Technology
@@ -189,15 +204,6 @@ Lessons learned become new standards.
 The engineering process evolves together with the software.
 
 
-## Review Workflow
-
-Every sprint must follow the review process:
-
-1. Architecture Review
-2. Documentation Review
-3. Code Review
-4. Acceptance Tests
-5. Release
 
 ## Review Workflow
 

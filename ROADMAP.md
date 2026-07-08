@@ -365,4 +365,130 @@ These initiatives are intentionally excluded from the current implementation roa
 
 ---
 
+
+# S1-004 — Domain Foundation
+
+**Status:** Planned
+
+**Target Version:** v0.3.0-alpha.1
+
+## Goal
+
+Establish the first version of the Domain Layer as the central business model of RajLED AI Ads OS.
+
+The Domain Layer becomes the common business language shared by all platform components and remains completely independent from external integrations, APIs and SDKs.
+
+## Planned Tasks
+
+### TASK-004.1 — Domain Layer Skeleton
+
+Create the initial Domain Layer structure, namespaces and package organization.
+
+**Deliverables**
+
+- Domain namespace
+- Common package
+- Shared package
+- Account package
+- Campaign package
+- Metrics package
+
+---
+
+### TASK-004.2 — Common Value Objects
+
+Introduce reusable immutable Value Objects representing core business concepts.
+
+**Planned Value Objects**
+
+- Identifier
+- ResourceName
+- Money
+- Currency
+- DateRange
+- Status
+
+---
+
+### TASK-004.3 — Campaign Domain Model
+
+Implement the first business entity representing an advertising campaign independently of any external provider.
+
+**Initial Scope**
+
+- Campaign identifier
+- Campaign name
+- Campaign status
+- Budget
+- Metrics
+- Resource identifier
+
+---
+
+### TASK-004.4 — Metrics Domain Model
+
+Introduce a strongly typed metrics model replacing primitive arrays.
+
+**Initial Metrics**
+
+- Impressions
+- Clicks
+- CTR
+- Average CPC
+- Cost
+- Conversions
+- Conversion Value
+
+---
+
+### TASK-004.5 — Domain Mapping Contracts
+
+Introduce mapping contracts separating Integration Layer from Domain Layer.
+
+**Initial Contracts**
+
+- CampaignMapperInterface
+- MetricsMapperInterface
+- AccountMapperInterface
+
+---
+
+## Expected Outcomes
+
+After completing S1-004 the platform will:
+
+- contain a dedicated Domain Layer,
+- expose a provider-independent business language,
+- isolate business models from integrations,
+- introduce reusable Value Objects,
+- prepare the foundation for Decision Engines.
+
+---
+
+## Architectural Focus
+
+The architectural focus of S1-004 is the transition from infrastructure development to business domain modelling.
+
+The following design principles are introduced:
+
+- Domain Owns the Language
+- Value Objects First
+- No Primitive Obsession
+- Integration Maps Data
+- Engine Operates on Domain Models
+
+---
+
+## Dependencies
+
+- S1-001 — Core Framework
+- S1-002 — Dependency Injection Framework
+- S1-003 — Integration Layer Foundation
+
+---
+
+## Target Release
+
+**v0.3.0-alpha.1**
+
 **This roadmap reflects the current strategic direction of RajLED AI Ads OS and evolves together with the product.**
