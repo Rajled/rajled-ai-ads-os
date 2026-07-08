@@ -9,29 +9,31 @@ declare(strict_types=1);
 
 namespace Rajled\AiAdsOs\Integration\GoogleAds;
 
+use Rajled\AiAdsOs\Integration\GoogleAds\Sdk\GoogleAdsSdkFactory;
+
 /**
  * Creates Google Ads client adapters when credentials are available.
  */
 final class ClientFactory
 {
-    private CredentialsManager $credentialsManager;
+    private GoogleAdsSdkFactory $sdkFactory;
 
-    public function __construct(CredentialsManager $credentialsManager)
+    public function __construct(CredentialsManager|GoogleAdsSdkFactory $clientFactory)
     {
-        $this->credentialsManager = $credentialsManager;
+        if ($clientFactory instanceof CredentialsManager) {
+            $clientFactory = new GoogleAdsSdkFactory($clientFactory);
+        }
+
+        $this->sdkFactory = $clientFactory;
     }
 
     public function canCreate(): bool
     {
-        return $this->credentialsManager->hasRequiredCredentials();
+        return $this->sdkFactory->canCreate();
     }
 
     public function create(): ?ClientInterface
     {
-        if (! $this->canCreate()) {
-            return null;
-        }
-
-        return new GoogleAdsClient($this->credentialsManager);
+        return $this->sdkFactory->create();
     }
 }

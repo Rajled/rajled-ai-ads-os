@@ -119,6 +119,8 @@ Business engines never communicate directly with external APIs.
 
 Integration providers are registered through a shared IntegrationRegistry. Provider-specific integrations expose readiness through IntegrationProviderInterface so application services can report integration health without depending on individual providers.
 
+Google Ads SDK-specific adapter code is isolated under `src/Integration/GoogleAds/Sdk/`. Other layers depend on integration contracts and factories instead of official SDK classes.
+
 The current Google Ads Integration Layer foundation does not perform live API requests, GAQL queries or campaign fetching. It prepares provider-specific services that future sprints can use behind integration-layer contracts.
 
 ---

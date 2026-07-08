@@ -55,6 +55,7 @@ Current Sprint:
 * Google Ads Integration Foundation services for configuration, credentials, client creation and connection readiness.
 * Health status now reports Google Ads readiness under the `google_ads` key without exposing credential values.
 * IntegrationProviderInterface and IntegrationRegistry for provider-independent integration health registration.
+* Google Ads SDK adapter namespace with SDK factory, client adapter and SDK exception stub.
 
 ## Sprint
 

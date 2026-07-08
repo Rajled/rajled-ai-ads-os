@@ -121,3 +121,108 @@ Architecture Backlog items should normally be implemented only when:
 - or they are required by a future sprint.
 
 Architecture Backlog items should not delay sprint completion unless explicitly approved.
+
+## AB-003
+
+**Title**
+
+Replace Provider Health Arrays with Value Object
+
+**Status**
+
+Deferred
+
+**Priority**
+
+Low
+
+**Area**
+
+Integration Layer
+
+**Introduced**
+
+Sprint S1-003 / TASK-003.2
+
+**Description**
+
+Integration providers currently expose their health information as associative arrays through the `getHealthStatus()` method.
+
+As the Integration Layer grows, consider replacing these arrays with a dedicated immutable `ProviderHealth` Value Object.
+
+Example:
+
+```php
+ProviderHealth
+```
+
+instead of:
+
+```php
+array<string, mixed>
+```
+
+**Reason**
+
+Using a dedicated Value Object would:
+
+- provide stronger typing,
+- improve IDE support,
+- simplify validation,
+- reduce array key duplication,
+- make future extensions easier without breaking existing consumers.
+
+**Current Decision**
+
+Associative arrays are sufficient for the current project stage.
+
+Introducing a Value Object would increase complexity without providing immediate practical benefits.
+
+The current implementation remains accepted.
+
+**Future Trigger**
+
+Revisit this item when:
+
+- multiple integration providers exist,
+- provider health payloads become more complex,
+- health information is consumed by multiple subsystems.
+
+**Related Documents**
+
+- ADR-002 Integration Layer Pattern
+- DOC-002 System Architecture
+
+**Notes**
+
+This item is an architectural refinement only.
+
+It does not represent a defect and should not delay sprint completion.
+
+## AB-004
+
+**Title**
+
+Introduce Provider Boot Phase
+
+**Status**
+
+Deferred
+
+**Priority**
+
+Medium
+
+**Area**
+
+Integration Layer
+
+**Introduced**
+
+Sprint S1-003 / TASK-003.2
+
+**Description**
+
+Separate service registration from runtime provider registration.
+
+...

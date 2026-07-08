@@ -14,6 +14,8 @@ This version exposes framework health and version endpoints.
 
 S1-003 extends the health payload with Google Ads integration readiness only. Integration readiness is provided through the IntegrationRegistry. It does not expose Google Ads campaign data or execute live Google Ads API requests.
 
+TASK-003.3 isolates future Google Ads PHP SDK usage behind an SDK adapter layer. REST response shapes are unchanged.
+
 Out of scope:
 
 * Google Ads campaign data endpoints
@@ -106,6 +108,8 @@ Unreleased
 S1-003 Google Ads Integration Foundation. Health response includes Google Ads readiness status.
 
 S1-003 TASK-003.2 Integration Provider Framework. Health response shape is unchanged and provider readiness is resolved through IntegrationRegistry.
+
+S1-003 TASK-003.3 Google Ads SDK Isolation. REST response shape is unchanged.
 
 0.2.0-alpha.1
 

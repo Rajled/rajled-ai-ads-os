@@ -12,6 +12,7 @@ namespace Rajled\AiAdsOs\Integration\GoogleAds;
 use Rajled\AiAdsOs\Config\ConfigurationManager;
 use Rajled\AiAdsOs\Core\ServiceContainer;
 use Rajled\AiAdsOs\Core\ServiceProviderInterface;
+use Rajled\AiAdsOs\Integration\GoogleAds\Sdk\GoogleAdsSdkFactory;
 use Rajled\AiAdsOs\Integration\IntegrationRegistry;
 
 /**
@@ -40,10 +41,19 @@ final class GoogleAdsServiceProvider implements ServiceProviderInterface
         );
 
         $container->singleton(
+            GoogleAdsSdkFactory::class,
+            static function (ServiceContainer $container): GoogleAdsSdkFactory {
+                return new GoogleAdsSdkFactory(
+                    $container->get(CredentialsManager::class)
+                );
+            }
+        );
+
+        $container->singleton(
             ClientFactory::class,
             static function (ServiceContainer $container): ClientFactory {
                 return new ClientFactory(
-                    $container->get(CredentialsManager::class)
+                    $container->get(GoogleAdsSdkFactory::class)
                 );
             }
         );
