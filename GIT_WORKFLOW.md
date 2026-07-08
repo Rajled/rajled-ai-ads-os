@@ -56,21 +56,14 @@ Rules:
 
 # Feature Branches
 
-Every task is developed in a dedicated feature branch.
+Sprint branches use the following convention:
 
-Branch naming convention:
-
-```text
-feature/<task-id>-<short-description>
-```
+sprint/<sprint-id>-<short-description>
 
 Examples:
 
-```text
-feature/S1-001-core-framework
-feature/S1-002-google-ads-integration
-feature/S1-003-gaql-query-layer
-```
+sprint/S1-003-google-ads-integration-foundation
+sprint/S1-004-snapshot-engine
 
 ---
 
@@ -393,3 +386,47 @@ This workflow is designed to keep RajLED AI Ads OS:
 * suitable for human and AI-assisted development.
 
 All contributors and AI agents must follow this Git workflow.
+
+---
+
+# Sprint Completion Workflow
+
+After all sprint tasks have been completed, the sprint follows the workflow below.
+
+```text
+TASK Completion
+        ↓
+Architecture Review
+        ↓
+Documentation Review
+        ↓
+Code Review
+        ↓
+Acceptance Tests
+        ↓
+Commit
+        ↓
+Push
+        ↓
+Sprint Retrospective
+        ↓
+Sprint Acceptance
+        ↓
+Merge to main
+        ↓
+Tag
+        ↓
+Release Notes
+```
+
+Sprint Retrospective must be completed before Sprint Acceptance.
+
+Sprint Acceptance confirms that:
+
+* all planned sprint tasks have been completed,
+* architecture review has passed,
+* documentation review has passed,
+* code review has passed,
+* acceptance tests have passed,
+* release documentation has been updated,
+* deferred architectural improvements have been recorded in `ARCHITECTURE_BACKLOG.md`.

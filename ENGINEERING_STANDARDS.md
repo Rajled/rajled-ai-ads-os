@@ -198,3 +198,39 @@ Every sprint must follow the review process:
 3. Code Review
 4. Acceptance Tests
 5. Release
+
+## Review Workflow
+
+Every sprint and implementation task must follow the review process:
+
+1. Architecture Review
+2. Documentation Review
+3. Code Review
+4. Acceptance Tests
+5. Commit
+6. Push
+
+Every sprint must additionally include:
+
+1. Sprint Retrospective
+2. Sprint Acceptance
+3. Merge
+4. Tag
+5. Release
+
+## Sprint Retrospective
+
+Each completed sprint concludes with a short retrospective.
+
+The retrospective documents:
+
+* architectural outcomes,
+* process improvements,
+* lessons learned,
+* deferred architectural decisions,
+* changes to the development methodology.
+
+Retrospectives are stored in:
+
+```text
+documentation/RETROSPECTIVES.md
