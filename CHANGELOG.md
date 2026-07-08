@@ -56,12 +56,14 @@ Current Sprint:
 * Health status now reports Google Ads readiness under the `google_ads` key without exposing credential values.
 * IntegrationProviderInterface and IntegrationRegistry for provider-independent integration health registration.
 * Google Ads SDK adapter namespace with SDK factory, client adapter and SDK exception stub.
+* Domain Layer skeleton package structure for S1-004.
 
 ## Sprint
 
 * S1-001 Core Framework
 * S1-002 Infrastructure Layer
 * S1-003 Google Ads Integration Foundation
+* S1-004 Domain Foundation
 
 ---
 

@@ -106,21 +106,30 @@ External providers are responsible only for translating technical data into busi
 
 ```text
 Domain/
-│
-├── Common/
-│   ├── Collection/
-│   ├── Contract/
-│   ├── Exception/
-│   └── ValueObject/
-│
-├── Shared/
-│
-├── Account/
-│
-├── Campaign/
-│
-└── Metrics/
+|-- Common/
+|   |-- Collection/
+|   |-- Contract/
+|   |-- Exception/
+|   `-- ValueObject/
+|
+|-- Account/
+|
+|-- Campaign/
+|
+`-- Metrics/
 ```
+
+---
+
+# Shared Package Decision
+
+TASK-004.1 does not introduce a `Shared` package.
+
+The `Common` package already owns reusable cross-domain structure for collections, contracts, exceptions and value objects.
+
+At this stage `Shared` would duplicate `Common` without a clear architectural responsibility.
+
+`Shared` may be introduced later only if a distinct responsibility emerges that cannot be represented by the existing Domain packages.
 
 ---
 

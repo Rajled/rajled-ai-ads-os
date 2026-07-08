@@ -72,8 +72,9 @@ Current implementation phase:
 * Google Ads Integration Layer foundation created
 * Integration Provider Framework created
 * Google Ads SDK Isolation layer created
+* Domain Layer skeleton created
 
-Implementation of advertising business functionality has not started yet. The current Google Ads work is limited to integration-layer configuration and readiness status.
+Implementation of advertising business functionality has not started yet. The current Domain work is architectural only and contains no business logic.
 
 ---
 
@@ -170,6 +171,7 @@ src/
   Core/
   Config/
   Dashboard/
+  Domain/
   Engine/
   Health/
   Integration/
