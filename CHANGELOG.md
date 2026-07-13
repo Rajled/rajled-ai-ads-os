@@ -214,4 +214,21 @@ Related project documentation:
 
 ---
 
+## [0.2.0-alpha.3] - 2026-07-10
+
+### Added
+
+- Domain Layer foundation.
+- Core Value Objects.
+- Financial & Time Value Objects.
+- Campaign Domain Entity.
+- Metrics Domain Model.
+- Integration Mapping Contracts.
+
+### Changed
+
+- Established provider-independent Domain model.
+- Introduced Integration mapping contracts separating Integration from Domain.
+
+
 This changelog evolves together with the product and serves as the official history of RajLED AI Ads OS.

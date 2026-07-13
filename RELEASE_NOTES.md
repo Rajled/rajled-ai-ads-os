@@ -256,6 +256,22 @@ Release Tag
 Documentation Update
 ```
 
+# v0.2.0-alpha.3
+
+## Highlights
+
+Sprint S1-004 introduces the complete Domain Foundation.
+
+Major additions include:
+
+- Domain Value Objects
+- Campaign Entity
+- Metrics Domain Model
+- Integration Mapping Contracts
+
+The project now possesses a provider-independent business model that will become the input for future Decision Engines.
+
+
 Release Notes are considered part of the Definition of Done.
 
 A release is not complete until its Release Notes have been prepared and reviewed.

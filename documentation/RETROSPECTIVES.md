@@ -57,3 +57,23 @@
 ## Outcome
 
 The project evolved from a Google Ads plugin into a generic integration platform.
+
+## Sprint S1-004
+
+### What went well
+
+- Domain model implemented incrementally.
+- Small task size significantly improved review quality.
+- Codex consistently followed architectural guidance.
+- Domain remained fully independent from infrastructure.
+
+### Improvements
+
+- Validate finite floating-point values during initial implementation.
+- Continue introducing contracts before concrete implementations.
+
+### Decisions
+
+- Model Before Behavior.
+- Contracts Before Implementations.
+- Primitive types are acceptable when dedicated Value Objects add no business value.
