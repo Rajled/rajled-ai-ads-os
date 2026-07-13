@@ -2,10 +2,10 @@
 /**
  * Plugin Name: RajLED AI Ads OS
  * Description: Core framework for the RajLED AI Ads OS platform.
- * Version: 0.2.0-alpha.1
+ * Version: 0.2.0-alpha.4
  * Author: RajLED
  * Text Domain: rajled-ai-ads-os
- * Requires PHP: 8.0
+ * Requires PHP: 8.1
  *
  * @package Rajled\AiAdsOs
  */
@@ -18,10 +18,32 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
-define('RAJLED_AI_ADS_OS_VERSION', '0.2.0-alpha.1');
+define('RAJLED_AI_ADS_OS_VERSION', '0.2.0-alpha.4');
 define('RAJLED_AI_ADS_OS_FILE', __FILE__);
 define('RAJLED_AI_ADS_OS_PATH', plugin_dir_path(__FILE__));
 define('RAJLED_AI_ADS_OS_URL', plugin_dir_url(__FILE__));
+
+$composerAutoloadPath = __DIR__ . '/vendor/autoload.php';
+
+if (! is_readable($composerAutoloadPath)) {
+    if (function_exists('add_action')) {
+        add_action(
+            'admin_notices',
+            static function (): void {
+                echo '<div class="notice notice-error"><p>';
+                echo esc_html(
+                    'RajLED AI Ads OS cannot start because Composer dependencies are missing. '
+                    . 'Install them with Composer or deploy the complete release ZIP.'
+                );
+                echo '</p></div>';
+            }
+        );
+    }
+
+    return;
+}
+
+require_once $composerAutoloadPath;
 
 spl_autoload_register(
     static function (string $className): void {

@@ -1,0 +1,11 @@
+{
+    "name": "rajled/rajled-ai-ads-os",
+    "description": "AI-powered Digital Advertising Operations Platform.",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.1"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
