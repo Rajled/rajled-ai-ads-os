@@ -4,7 +4,8 @@
     "type": "project",
     "license": "proprietary",
     "require": {
-        "php": ">=8.1"
+        "php": ">=8.3",
+        "googleads/google-ads-php": "^33.5"
     },
     "minimum-stability": "stable",
     "prefer-stable": true

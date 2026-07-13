@@ -5,7 +5,7 @@
  * Version: 0.2.0-alpha.4
  * Author: RajLED
  * Text Domain: rajled-ai-ads-os
- * Requires PHP: 8.1
+ * Requires PHP: 8.3
  *
  * @package Rajled\AiAdsOs
  */
