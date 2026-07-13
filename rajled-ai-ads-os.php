@@ -70,6 +70,22 @@ function rajled_ai_ads_os(): Kernel
     static $kernel = null;
 
     if (null === $kernel) {
+        $googleAdsConstants = array(
+            'developer_token'   => 'RAJLED_GOOGLE_ADS_DEVELOPER_TOKEN',
+            'client_id'         => 'RAJLED_GOOGLE_ADS_CLIENT_ID',
+            'client_secret'     => 'RAJLED_GOOGLE_ADS_CLIENT_SECRET',
+            'refresh_token'     => 'RAJLED_GOOGLE_ADS_REFRESH_TOKEN',
+            'login_customer_id' => 'RAJLED_GOOGLE_ADS_LOGIN_CUSTOMER_ID',
+        );
+        $googleAdsConfiguration = array();
+
+        foreach ($googleAdsConstants as $configurationKey => $constantName) {
+            $value = defined($constantName) ? constant($constantName) : '';
+            $googleAdsConfiguration[$configurationKey] = is_scalar($value)
+                ? trim((string) $value)
+                : '';
+        }
+
         $kernel = Kernel::create(
             array(
                 'plugin_name'    => 'RajLED AI Ads OS',
@@ -78,6 +94,7 @@ function rajled_ai_ads_os(): Kernel
                 'plugin_file'    => RAJLED_AI_ADS_OS_FILE,
                 'plugin_path'    => RAJLED_AI_ADS_OS_PATH,
                 'plugin_url'     => RAJLED_AI_ADS_OS_URL,
+                'google_ads'     => $googleAdsConfiguration,
             )
         );
     }
