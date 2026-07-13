@@ -9,7 +9,11 @@ declare(strict_types=1);
 
 namespace Rajled\AiAdsOs\Integration\GoogleAds\Sdk;
 
+use Google\Ads\GoogleAds\Lib\OAuth2TokenBuilder;
+use Google\Ads\GoogleAds\Lib\V24\GoogleAdsClientBuilder;
 use Rajled\AiAdsOs\Integration\GoogleAds\CredentialsManager;
+use Rajled\AiAdsOs\Integration\GoogleAds\GoogleAdsConfiguration;
+use Throwable;
 
 /**
  * Creates Google Ads SDK adapters without performing live API calls.
@@ -34,6 +38,66 @@ final class GoogleAdsSdkFactory
             return null;
         }
 
-        return new GoogleAdsSdkClient($this->credentialsManager);
+        $loginCustomerId = $this->getLoginCustomerId();
+
+        try {
+            $oAuth2Credential = (new OAuth2TokenBuilder())
+                ->withClientId(
+                    $this->credentialsManager->getCredential(GoogleAdsConfiguration::CLIENT_ID)
+                )
+                ->withClientSecret(
+                    $this->credentialsManager->getCredential(GoogleAdsConfiguration::CLIENT_SECRET)
+                )
+                ->withRefreshToken(
+                    $this->credentialsManager->getCredential(GoogleAdsConfiguration::REFRESH_TOKEN)
+                )
+                ->build();
+
+            $clientBuilder = (new GoogleAdsClientBuilder())
+                ->withDeveloperToken(
+                    $this->credentialsManager->getCredential(GoogleAdsConfiguration::DEVELOPER_TOKEN)
+                )
+                ->withOAuth2Credential($oAuth2Credential);
+
+            if (null !== $loginCustomerId) {
+                $clientBuilder->withLoginCustomerId($loginCustomerId);
+            }
+
+            return new GoogleAdsSdkClient(
+                $this->credentialsManager,
+                $clientBuilder->build()
+            );
+        } catch (Throwable $exception) {
+            throw new GoogleAdsSdkException(
+                'Unable to initialize the Google Ads PHP SDK client from configured credentials.',
+                0,
+                $exception
+            );
+        }
+    }
+
+    private function getLoginCustomerId(): ?int
+    {
+        $loginCustomerId = $this->credentialsManager->getCredential(
+            GoogleAdsConfiguration::LOGIN_CUSTOMER_ID
+        );
+
+        if ('' === $loginCustomerId) {
+            return null;
+        }
+
+        $validatedLoginCustomerId = filter_var(
+            $loginCustomerId,
+            FILTER_VALIDATE_INT,
+            array('options' => array('min_range' => 1))
+        );
+
+        if (false === $validatedLoginCustomerId) {
+            throw new GoogleAdsSdkException(
+                'Google Ads login customer ID must be a positive integer.'
+            );
+        }
+
+        return $validatedLoginCustomerId;
     }
 }
