@@ -232,3 +232,21 @@ Related project documentation:
 
 
 This changelog evolves together with the product and serves as the official history of RajLED AI Ads OS.
+
+
+## [0.2.0-alpha.4] - 2026-07-13
+
+### Added
+
+- Google Ads Campaign Mapper.
+- Google Ads Metrics Mapper.
+- Provider-neutral mapping from Integration to Domain.
+
+### Changed
+
+- Established the Integration → Domain bridge.
+- Confirmed architectural separation between SDK adapters and Domain model.
+
+### Deferred
+
+- Google Ads SDK Campaign Reader moved to Sprint S1-006 pending official SDK integration.

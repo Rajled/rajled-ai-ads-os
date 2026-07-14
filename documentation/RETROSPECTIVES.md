@@ -77,3 +77,24 @@ The project evolved from a Google Ads plugin into a generic integration platform
 - Model Before Behavior.
 - Contracts Before Implementations.
 - Primitive types are acceptable when dedicated Value Objects add no business value.
+
+## Sprint S1-005
+
+### What went well
+
+- Successfully connected the Integration Layer to the Domain Layer through provider-independent mapping.
+- Mapping contracts proved sufficient without introducing DTOs or additional abstractions.
+- Domain remained completely independent from Google Ads SDK.
+- Architecture review identified speculative SDK code before it entered production.
+
+### Improvements
+
+- Avoid implementing SDK readers before a verified SDK dependency is available.
+- Continue validating architectural assumptions through implementation reviews rather than assumptions.
+
+### Decisions
+
+- Mapping belongs to Integration.
+- SDK normalization belongs to the SDK boundary.
+- Domain receives only provider-neutral data.
+- Real SDK integrations are implemented only against verified SDK types.

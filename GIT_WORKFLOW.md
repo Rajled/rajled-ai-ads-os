@@ -430,3 +430,28 @@ Sprint Acceptance confirms that:
 * acceptance tests have passed,
 * release documentation has been updated,
 * deferred architectural improvements have been recorded in `ARCHITECTURE_BACKLOG.md`.
+
+
+### Sprint Documentation
+
+After Sprint Acceptance update only:
+
+1. CHANGELOG.md
+2. RELEASE_NOTES.md
+3. documentation/RETROSPECTIVES.md
+4. documentation/sprints/SPR-XXX.md
+
+Update architecture documentation only if the accepted sprint changes the project architecture.
+
+Update governance documentation only when the project workflow or development standards change.### Sprint Documentation
+
+After Sprint Acceptance update only:
+
+1. CHANGELOG.md
+2. RELEASE_NOTES.md
+3. documentation/RETROSPECTIVES.md
+4. documentation/sprints/SPR-XXX.md
+
+Update architecture documentation only if the accepted sprint changes the project architecture.
+
+Update governance documentation only when the project workflow or development standards change.

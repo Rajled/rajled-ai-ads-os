@@ -236,6 +236,58 @@ The retrospective documents:
 * deferred architectural decisions,
 * changes to the development methodology.
 
+
+### Sprint Documentation Policy
+
+To keep documentation maintainable and focused, project documents are divided into three categories.
+
+#### 1. Sprint Documents (updated every sprint)
+
+The following documents are updated as part of every completed sprint:
+
+- CHANGELOG.md
+- RELEASE_NOTES.md
+- documentation/RETROSPECTIVES.md
+- documentation/sprints/SPR-XXX.md
+
+These documents describe completed work only and are updated after Sprint Acceptance.
+
+#### 2. Architecture Documents (updated only when architecture changes)
+
+The following documents are updated only when the sprint introduces architectural changes:
+
+- ARCHITECTURE.md
+- DOC-002 System Architecture
+- DOC-003 Domain Model
+- DOC-004 Data Model
+- DOC-005 Engine Specification
+- DOC-006 REST API
+- ADR documents
+- ROADMAP.md (only when project planning changes)
+
+Minor implementation changes do not require updates to these documents.
+
+#### 3. Governance Documents (updated exceptionally)
+
+Governance documents are updated only when the development process or project standards change:
+
+- README.md
+- AGENTS.md
+- ENGINEERING_STANDARDS.md
+- GIT_WORKFLOW.md
+- CODING_STANDARDS.md
+- TESTING.md
+- VERSIONING.md
+- DEVELOPMENT.md
+- DOCUMENTATION_POLICY.md
+
+These documents should remain stable and should not be modified during ordinary sprint work.
+
+The objective is to ensure that documentation always reflects accepted architecture and implemented functionality while minimizing unnecessary maintenance effort.
+
+
+
+
 Retrospectives are stored in:
 
 ```text

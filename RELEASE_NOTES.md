@@ -275,3 +275,14 @@ The project now possesses a provider-independent business model that will become
 Release Notes are considered part of the Definition of Done.
 
 A release is not complete until its Release Notes have been prepared and reviewed.
+
+
+# v0.2.0-alpha.4
+
+## Highlights
+
+Sprint S1-005 introduced the first Integration → Domain bridge.
+
+The system now supports provider-independent mapping from normalized integration data into the Domain model while maintaining complete isolation from the Google Ads SDK.
+
+Implementation of the first SDK reader has intentionally been deferred until the official Google Ads SDK is installed and verified.
