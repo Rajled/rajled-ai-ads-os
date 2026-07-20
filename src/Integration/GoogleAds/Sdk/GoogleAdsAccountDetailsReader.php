@@ -56,26 +56,22 @@ final class GoogleAdsAccountDetailsReader
     public function discover(): array
     {
         $rootAccounts = $this->accountDiscovery->discover();
-        $directClient = $this->requireClient(
-            $this->clientFactory->createWithoutLoginCustomerId()
-        );
         $details = array();
 
         foreach ($rootAccounts as $rootAccount) {
-            $rootDetails = $this->readRootAccount($directClient, $rootAccount);
+            $rootClient = $this->requireClient(
+                $this->clientFactory->createForLoginCustomerId(
+                    $rootAccount->getCustomerId()
+                )
+            );
+            $rootDetails = $this->readRootAccount($rootClient, $rootAccount);
             $details[] = $rootDetails;
 
             if (! $rootDetails->isManager()) {
                 continue;
             }
 
-            $managerClient = $this->requireClient(
-                $this->clientFactory->createForLoginCustomerId(
-                    $rootDetails->getCustomerId()
-                )
-            );
-
-            foreach ($this->readManagerHierarchy($managerClient, $rootDetails) as $clientDetails) {
+            foreach ($this->readManagerHierarchy($rootClient, $rootDetails) as $clientDetails) {
                 $details[] = $clientDetails;
             }
         }
