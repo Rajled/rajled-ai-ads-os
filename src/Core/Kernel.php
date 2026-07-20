@@ -9,13 +9,17 @@ declare(strict_types=1);
 
 namespace Rajled\AiAdsOs\Core;
 
+use Rajled\AiAdsOs\Application\Account\AccountCatalogInterface;
+use Rajled\AiAdsOs\Application\Account\AccountSelectionService;
+use Rajled\AiAdsOs\Application\Account\ActiveAccountStoreInterface;
 use Rajled\AiAdsOs\Config\ConfigurationManager;
 use Rajled\AiAdsOs\Dashboard\DashboardPage;
+use Rajled\AiAdsOs\Dashboard\GoogleAds\GoogleAdsAccountPanel;
 use Rajled\AiAdsOs\Engine\EngineRegistry;
 use Rajled\AiAdsOs\Health\HealthManager;
 use Rajled\AiAdsOs\Integration\GoogleAds\GoogleAdsServiceProvider;
-use Rajled\AiAdsOs\Integration\GoogleAds\Sdk\GoogleAdsAccountDiscovery;
 use Rajled\AiAdsOs\Integration\GoogleAds\Sdk\GoogleAdsConnectivityHealthCheck;
+use Rajled\AiAdsOs\Infrastructure\WordPress\GoogleAds\GoogleAdsActiveAccountStore;
 use Rajled\AiAdsOs\Logging\Logger;
 use Rajled\AiAdsOs\Rest\RestController;
 
@@ -116,6 +120,37 @@ final class Kernel
     private function registerWordPressAdapters(): void
     {
         $this->container->singleton(
+            ActiveAccountStoreInterface::class,
+            static function (ServiceContainer $container): ActiveAccountStoreInterface {
+                return new GoogleAdsActiveAccountStore(
+                    $container->get(Logger::class)
+                );
+            }
+        );
+
+        $this->container->singleton(
+            AccountSelectionService::class,
+            static function (ServiceContainer $container): AccountSelectionService {
+                return new AccountSelectionService(
+                    $container->get(AccountCatalogInterface::class),
+                    $container->get(ActiveAccountStoreInterface::class)
+                );
+            }
+        );
+
+        $this->container->singleton(
+            GoogleAdsAccountPanel::class,
+            static function (ServiceContainer $container): GoogleAdsAccountPanel {
+                return new GoogleAdsAccountPanel(
+                    $container->get(AccountCatalogInterface::class),
+                    $container->get(ActiveAccountStoreInterface::class),
+                    $container->get(AccountSelectionService::class),
+                    $container->get(Logger::class)
+                );
+            }
+        );
+
+        $this->container->singleton(
             RestController::class,
             static function (ServiceContainer $container): RestController {
                 return new RestController(
@@ -132,7 +167,7 @@ final class Kernel
                     $container->get(ConfigurationManager::class),
                     $container->get(HealthManager::class),
                     $container->get(GoogleAdsConnectivityHealthCheck::class),
-                    $container->get(GoogleAdsAccountDiscovery::class)
+                    $container->get(GoogleAdsAccountPanel::class)
                 );
             }
         );

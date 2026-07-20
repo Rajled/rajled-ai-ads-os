@@ -9,10 +9,14 @@ declare(strict_types=1);
 
 namespace Rajled\AiAdsOs\Integration\GoogleAds;
 
+use Rajled\AiAdsOs\Application\Account\AccountCatalogInterface;
 use Rajled\AiAdsOs\Config\ConfigurationManager;
 use Rajled\AiAdsOs\Core\ServiceContainer;
 use Rajled\AiAdsOs\Core\ServiceProviderInterface;
+use Rajled\AiAdsOs\Integration\GoogleAds\Account\GoogleAdsAccountCatalog;
+use Rajled\AiAdsOs\Integration\GoogleAds\Mapping\GoogleAdsAccountMapper;
 use Rajled\AiAdsOs\Integration\GoogleAds\Sdk\GoogleAdsAccountDiscovery;
+use Rajled\AiAdsOs\Integration\GoogleAds\Sdk\GoogleAdsAccountDetailsReader;
 use Rajled\AiAdsOs\Integration\GoogleAds\Sdk\GoogleAdsConnectivityChecker;
 use Rajled\AiAdsOs\Integration\GoogleAds\Sdk\GoogleAdsConnectivityHealthCheck;
 use Rajled\AiAdsOs\Integration\GoogleAds\Sdk\GoogleAdsSdkFactory;
@@ -58,6 +62,41 @@ final class GoogleAdsServiceProvider implements ServiceProviderInterface
                 return new GoogleAdsAccountDiscovery(
                     $container->get(GoogleAdsSdkFactory::class)
                 );
+            }
+        );
+
+        $container->singleton(
+            GoogleAdsAccountDetailsReader::class,
+            static function (ServiceContainer $container): GoogleAdsAccountDetailsReader {
+                return new GoogleAdsAccountDetailsReader(
+                    $container->get(GoogleAdsAccountDiscovery::class),
+                    $container->get(GoogleAdsSdkFactory::class)
+                );
+            }
+        );
+
+        $container->singleton(
+            GoogleAdsAccountMapper::class,
+            static function (): GoogleAdsAccountMapper {
+                return new GoogleAdsAccountMapper();
+            }
+        );
+
+        $container->singleton(
+            GoogleAdsAccountCatalog::class,
+            static function (ServiceContainer $container): GoogleAdsAccountCatalog {
+                return new GoogleAdsAccountCatalog(
+                    $container->get(GoogleAdsAccountDetailsReader::class),
+                    $container->get(GoogleAdsAccountMapper::class),
+                    $container->get(GoogleAdsConfiguration::class)
+                );
+            }
+        );
+
+        $container->singleton(
+            AccountCatalogInterface::class,
+            static function (ServiceContainer $container): AccountCatalogInterface {
+                return $container->get(GoogleAdsAccountCatalog::class);
             }
         );
 

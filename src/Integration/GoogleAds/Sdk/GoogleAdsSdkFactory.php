@@ -38,8 +38,29 @@ final class GoogleAdsSdkFactory
             return null;
         }
 
-        $loginCustomerId = $this->getLoginCustomerId();
+        return $this->createClient($this->getLoginCustomerId());
+    }
 
+    public function createWithoutLoginCustomerId(): ?GoogleAdsSdkClient
+    {
+        if (! $this->canCreate()) {
+            return null;
+        }
+
+        return $this->createClient(null);
+    }
+
+    public function createForLoginCustomerId(string $loginCustomerId): ?GoogleAdsSdkClient
+    {
+        if (! $this->canCreate()) {
+            return null;
+        }
+
+        return $this->createClient($this->validateLoginCustomerId($loginCustomerId));
+    }
+
+    private function createClient(?int $loginCustomerId): GoogleAdsSdkClient
+    {
         try {
             $oAuth2Credential = (new OAuth2TokenBuilder())
                 ->withClientId(
@@ -86,6 +107,11 @@ final class GoogleAdsSdkFactory
             return null;
         }
 
+        return $this->validateLoginCustomerId($loginCustomerId);
+    }
+
+    private function validateLoginCustomerId(string $loginCustomerId): int
+    {
         $validatedLoginCustomerId = filter_var(
             $loginCustomerId,
             FILTER_VALIDATE_INT,
