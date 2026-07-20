@@ -92,7 +92,12 @@ final class GoogleAdsSdkFactory
             throw new GoogleAdsSdkException(
                 'Unable to initialize the Google Ads PHP SDK client from configured credentials.',
                 0,
-                $exception
+                $exception,
+                GoogleAdsSdkFailureClassifier::classify(
+                    $exception,
+                    GoogleAdsSdkException::STAGE_CLIENT_INITIALIZATION,
+                    GoogleAdsSdkException::CATEGORY_CLIENT_INITIALIZATION
+                )
             );
         }
     }
@@ -120,7 +125,13 @@ final class GoogleAdsSdkFactory
 
         if (false === $validatedLoginCustomerId) {
             throw new GoogleAdsSdkException(
-                'Google Ads login customer ID must be a positive integer.'
+                'Google Ads login customer ID must be a positive integer.',
+                0,
+                null,
+                array(
+                    'sdk_failure_stage'    => GoogleAdsSdkException::STAGE_CLIENT_INITIALIZATION,
+                    'sdk_failure_category' => GoogleAdsSdkException::CATEGORY_CLIENT_INITIALIZATION,
+                )
             );
         }
 

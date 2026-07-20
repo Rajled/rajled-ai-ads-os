@@ -48,7 +48,15 @@ final class GoogleAdsSdkClient implements ClientInterface
     public function getNativeClient(): GoogleAdsClient
     {
         if (null === $this->nativeClient) {
-            throw new GoogleAdsSdkException('Google Ads PHP SDK client is not initialized.');
+            throw new GoogleAdsSdkException(
+                'Google Ads PHP SDK client is not initialized.',
+                0,
+                null,
+                array(
+                    'sdk_failure_stage'    => GoogleAdsSdkException::STAGE_CLIENT_INITIALIZATION,
+                    'sdk_failure_category' => GoogleAdsSdkException::CATEGORY_CLIENT_INITIALIZATION,
+                )
+            );
         }
 
         return $this->nativeClient;

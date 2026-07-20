@@ -87,7 +87,13 @@ final class GoogleAdsAccountDetailsReader
     {
         if (null === $client || ! $client->hasNativeClient()) {
             throw new GoogleAdsSdkException(
-                'Google Ads PHP SDK client is not initialized.'
+                'Google Ads PHP SDK client is not initialized.',
+                0,
+                null,
+                array(
+                    'sdk_failure_stage'    => GoogleAdsSdkException::STAGE_CLIENT_INITIALIZATION,
+                    'sdk_failure_category' => GoogleAdsSdkException::CATEGORY_CLIENT_INITIALIZATION,
+                )
             );
         }
 
@@ -111,8 +117,9 @@ final class GoogleAdsAccountDetailsReader
 
             foreach ($response->iterateAllElements() as $row) {
                 if (! $row instanceof GoogleAdsRow || null !== $customer) {
-                    throw new GoogleAdsSdkException(
-                        'Google Ads returned an invalid root account response.'
+                    throw $this->responseException(
+                        'Google Ads returned an invalid root account response.',
+                        GoogleAdsSdkException::STAGE_ROOT_ACCOUNT_QUERY
                     );
                 }
 
@@ -120,23 +127,35 @@ final class GoogleAdsAccountDetailsReader
             }
 
             if (! $customer instanceof Customer) {
-                throw new GoogleAdsSdkException(
-                    'Google Ads returned an invalid root account response.'
+                throw $this->responseException(
+                    'Google Ads returned an invalid root account response.',
+                    GoogleAdsSdkException::STAGE_ROOT_ACCOUNT_QUERY
                 );
             }
 
-            $customerId = $this->normalizeCustomerId($customer->getId());
+            $customerId = $this->normalizeCustomerId(
+                $customer->getId(),
+                GoogleAdsSdkException::STAGE_ROOT_ACCOUNT_QUERY
+            );
 
             if ($rootAccount->getCustomerId() !== $customerId) {
-                throw new GoogleAdsSdkException(
-                    'Google Ads returned inconsistent root account data.'
+                throw $this->responseException(
+                    'Google Ads returned inconsistent root account data.',
+                    GoogleAdsSdkException::STAGE_ROOT_ACCOUNT_QUERY
                 );
             }
 
             return new GoogleAdsAccountDetails(
-                $this->normalizeResourceName($customer->getResourceName(), $customerId),
+                $this->normalizeResourceName(
+                    $customer->getResourceName(),
+                    $customerId,
+                    GoogleAdsSdkException::STAGE_ROOT_ACCOUNT_QUERY
+                ),
                 $customerId,
-                $this->normalizeDescriptiveName($customer->getDescriptiveName()),
+                $this->normalizeDescriptiveName(
+                    $customer->getDescriptiveName(),
+                    GoogleAdsSdkException::STAGE_ROOT_ACCOUNT_QUERY
+                ),
                 $customer->getManager(),
                 null,
                 0
@@ -147,7 +166,12 @@ final class GoogleAdsAccountDetailsReader
             throw new GoogleAdsSdkException(
                 'Unable to retrieve Google Ads root account details.',
                 0,
-                $exception
+                $exception,
+                GoogleAdsSdkFailureClassifier::classify(
+                    $exception,
+                    GoogleAdsSdkException::STAGE_ROOT_ACCOUNT_QUERY,
+                    GoogleAdsSdkException::CATEGORY_ROOT_ACCOUNT_QUERY
+                )
             );
         }
     }
@@ -172,23 +196,29 @@ final class GoogleAdsAccountDetailsReader
 
             foreach ($response->iterateAllElements() as $row) {
                 if (! $row instanceof GoogleAdsRow) {
-                    throw new GoogleAdsSdkException(
-                        'Google Ads returned an invalid manager hierarchy response.'
+                    throw $this->responseException(
+                        'Google Ads returned an invalid manager hierarchy response.',
+                        GoogleAdsSdkException::STAGE_MANAGER_HIERARCHY_QUERY
                     );
                 }
 
                 $customerClient = $row->getCustomerClient();
 
                 if (! $customerClient instanceof CustomerClient) {
-                    throw new GoogleAdsSdkException(
-                        'Google Ads returned an invalid manager hierarchy response.'
+                    throw $this->responseException(
+                        'Google Ads returned an invalid manager hierarchy response.',
+                        GoogleAdsSdkException::STAGE_MANAGER_HIERARCHY_QUERY
                     );
                 }
 
-                $customerId = $this->normalizeCustomerId($customerClient->getId());
+                $customerId = $this->normalizeCustomerId(
+                    $customerClient->getId(),
+                    GoogleAdsSdkException::STAGE_MANAGER_HIERARCHY_QUERY
+                );
                 $resourceName = $this->normalizeResourceName(
                     $customerClient->getClientCustomer(),
-                    $customerId
+                    $customerId,
+                    GoogleAdsSdkException::STAGE_MANAGER_HIERARCHY_QUERY
                 );
 
                 if ($rootAccount->getCustomerId() === $customerId) {
@@ -196,12 +226,14 @@ final class GoogleAdsAccountDetailsReader
                 }
 
                 $hierarchyLevel = $this->normalizeHierarchyLevel(
-                    $customerClient->getLevel()
+                    $customerClient->getLevel(),
+                    GoogleAdsSdkException::STAGE_MANAGER_HIERARCHY_QUERY
                 );
 
                 if (0 === $hierarchyLevel) {
-                    throw new GoogleAdsSdkException(
-                        'Google Ads returned an invalid manager hierarchy level.'
+                    throw $this->responseException(
+                        'Google Ads returned an invalid manager hierarchy level.',
+                        GoogleAdsSdkException::STAGE_MANAGER_HIERARCHY_QUERY
                     );
                 }
 
@@ -209,7 +241,8 @@ final class GoogleAdsAccountDetailsReader
                     $resourceName,
                     $customerId,
                     $this->normalizeDescriptiveName(
-                        $customerClient->getDescriptiveName()
+                        $customerClient->getDescriptiveName(),
+                        GoogleAdsSdkException::STAGE_MANAGER_HIERARCHY_QUERY
                     ),
                     $customerClient->getManager(),
                     $rootAccount->getCustomerId(),
@@ -224,12 +257,17 @@ final class GoogleAdsAccountDetailsReader
             throw new GoogleAdsSdkException(
                 'Unable to retrieve the Google Ads manager account hierarchy.',
                 0,
-                $exception
+                $exception,
+                GoogleAdsSdkFailureClassifier::classify(
+                    $exception,
+                    GoogleAdsSdkException::STAGE_MANAGER_HIERARCHY_QUERY,
+                    GoogleAdsSdkException::CATEGORY_MANAGER_HIERARCHY_QUERY
+                )
             );
         }
     }
 
-    private function normalizeCustomerId(mixed $customerId): string
+    private function normalizeCustomerId(mixed $customerId, string $stage): string
     {
         if (is_int($customerId)) {
             if ($customerId > 0) {
@@ -248,16 +286,22 @@ final class GoogleAdsAccountDetailsReader
             }
         }
 
-        throw new GoogleAdsSdkException(
-            'Google Ads returned an invalid customer identifier.'
+        throw $this->responseException(
+            'Google Ads returned an invalid customer identifier.',
+            $stage
         );
     }
 
-    private function normalizeResourceName(mixed $resourceName, string $customerId): string
+    private function normalizeResourceName(
+        mixed $resourceName,
+        string $customerId,
+        string $stage
+    ): string
     {
         if (! is_string($resourceName)) {
-            throw new GoogleAdsSdkException(
-                'Google Ads returned an invalid customer resource name.'
+            throw $this->responseException(
+                'Google Ads returned an invalid customer resource name.',
+                $stage
             );
         }
 
@@ -268,19 +312,21 @@ final class GoogleAdsAccountDetailsReader
             1 !== preg_match('/\Acustomers\/([0-9]+)\z/', $resourceName, $matches)
             || $customerId !== $matches[1]
         ) {
-            throw new GoogleAdsSdkException(
-                'Google Ads returned an invalid customer resource name.'
+            throw $this->responseException(
+                'Google Ads returned an invalid customer resource name.',
+                $stage
             );
         }
 
         return $resourceName;
     }
 
-    private function normalizeDescriptiveName(mixed $descriptiveName): ?string
+    private function normalizeDescriptiveName(mixed $descriptiveName, string $stage): ?string
     {
         if (! is_string($descriptiveName)) {
-            throw new GoogleAdsSdkException(
-                'Google Ads returned an invalid account descriptive name.'
+            throw $this->responseException(
+                'Google Ads returned an invalid account descriptive name.',
+                $stage
             );
         }
 
@@ -289,7 +335,7 @@ final class GoogleAdsAccountDetailsReader
         return '' === $descriptiveName ? null : $descriptiveName;
     }
 
-    private function normalizeHierarchyLevel(mixed $hierarchyLevel): int
+    private function normalizeHierarchyLevel(mixed $hierarchyLevel, string $stage): int
     {
         if (is_int($hierarchyLevel) && $hierarchyLevel >= 0) {
             return $hierarchyLevel;
@@ -308,8 +354,22 @@ final class GoogleAdsAccountDetailsReader
             }
         }
 
-        throw new GoogleAdsSdkException(
-            'Google Ads returned an invalid manager hierarchy level.'
+        throw $this->responseException(
+            'Google Ads returned an invalid manager hierarchy level.',
+            $stage
+        );
+    }
+
+    private function responseException(string $message, string $stage): GoogleAdsSdkException
+    {
+        return new GoogleAdsSdkException(
+            $message,
+            0,
+            null,
+            array(
+                'sdk_failure_stage'    => $stage,
+                'sdk_failure_category' => GoogleAdsSdkException::CATEGORY_MALFORMED_RESPONSE,
+            )
         );
     }
 }

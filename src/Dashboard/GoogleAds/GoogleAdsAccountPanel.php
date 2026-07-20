@@ -177,7 +177,6 @@ final class GoogleAdsAccountPanel
                 'google_ads_discovery_failure',
                 $exception
             );
-
             return false;
         } catch (Throwable $exception) {
             $this->logFailure(
@@ -532,6 +531,12 @@ final class GoogleAdsAccountPanel
             'failure_category' => $failureCategory,
             'exception_class'  => get_class($exception),
         );
+
+        if ($exception instanceof GoogleAdsSdkException) {
+            foreach ($exception->getDiagnosticContext() as $key => $value) {
+                $context[$key] = $value;
+            }
+        }
 
         if ($warning) {
             $this->logger->warning($message, $context);

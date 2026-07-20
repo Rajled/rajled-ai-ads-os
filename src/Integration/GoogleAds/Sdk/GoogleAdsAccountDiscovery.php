@@ -37,7 +37,13 @@ final class GoogleAdsAccountDiscovery
 
         if (null === $client || ! $client->hasNativeClient()) {
             throw new GoogleAdsSdkException(
-                'Google Ads PHP SDK client is not initialized.'
+                'Google Ads PHP SDK client is not initialized.',
+                0,
+                null,
+                array(
+                    'sdk_failure_stage'    => GoogleAdsSdkException::STAGE_CLIENT_INITIALIZATION,
+                    'sdk_failure_category' => GoogleAdsSdkException::CATEGORY_CLIENT_INITIALIZATION,
+                )
             );
         }
 
@@ -51,14 +57,31 @@ final class GoogleAdsAccountDiscovery
             throw new GoogleAdsSdkException(
                 'Unable to discover accessible Google Ads accounts.',
                 0,
-                $exception
+                $exception,
+                GoogleAdsSdkFailureClassifier::classify(
+                    $exception,
+                    GoogleAdsSdkException::STAGE_LIST_ACCESSIBLE_CUSTOMERS,
+                    GoogleAdsSdkException::CATEGORY_LIST_ACCESSIBLE_CUSTOMERS
+                )
             );
         }
 
         $accounts = array();
 
-        foreach ($resourceNames as $resourceName) {
-            $accounts[] = $this->createAccount($resourceName);
+        try {
+            foreach ($resourceNames as $resourceName) {
+                $accounts[] = $this->createAccount($resourceName);
+            }
+        } catch (InvalidGoogleAdsAccountResourceNameException $exception) {
+            throw new GoogleAdsSdkException(
+                'Google Ads returned an invalid accessible account response.',
+                0,
+                $exception,
+                array(
+                    'sdk_failure_stage'    => GoogleAdsSdkException::STAGE_LIST_ACCESSIBLE_CUSTOMERS,
+                    'sdk_failure_category' => GoogleAdsSdkException::CATEGORY_MALFORMED_RESPONSE,
+                )
+            );
         }
 
         return $accounts;
