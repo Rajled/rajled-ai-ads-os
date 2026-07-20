@@ -12,9 +12,9 @@ namespace Rajled\AiAdsOs\Integration\GoogleAds;
 use Rajled\AiAdsOs\Config\ConfigurationManager;
 use Rajled\AiAdsOs\Core\ServiceContainer;
 use Rajled\AiAdsOs\Core\ServiceProviderInterface;
+use Rajled\AiAdsOs\Integration\GoogleAds\Sdk\GoogleAdsAccountDiscovery;
 use Rajled\AiAdsOs\Integration\GoogleAds\Sdk\GoogleAdsConnectivityChecker;
 use Rajled\AiAdsOs\Integration\GoogleAds\Sdk\GoogleAdsConnectivityHealthCheck;
-use Rajled\AiAdsOs\Integration\GoogleAds\Sdk\GoogleAdsSdkException;
 use Rajled\AiAdsOs\Integration\GoogleAds\Sdk\GoogleAdsSdkFactory;
 use Rajled\AiAdsOs\Integration\IntegrationRegistry;
 
@@ -52,18 +52,21 @@ final class GoogleAdsServiceProvider implements ServiceProviderInterface
             }
         );
 
+        $container->singleton(
+            GoogleAdsAccountDiscovery::class,
+            static function (ServiceContainer $container): GoogleAdsAccountDiscovery {
+                return new GoogleAdsAccountDiscovery(
+                    $container->get(GoogleAdsSdkFactory::class)
+                );
+            }
+        );
+
         $container->register(
             GoogleAdsConnectivityChecker::class,
             static function (ServiceContainer $container): GoogleAdsConnectivityChecker {
-                $client = $container->get(GoogleAdsSdkFactory::class)->create();
-
-                if (null === $client || ! $client->hasNativeClient()) {
-                    throw new GoogleAdsSdkException(
-                        'Google Ads PHP SDK client is not initialized.'
-                    );
-                }
-
-                return new GoogleAdsConnectivityChecker($client);
+                return new GoogleAdsConnectivityChecker(
+                    $container->get(GoogleAdsAccountDiscovery::class)
+                );
             }
         );
 

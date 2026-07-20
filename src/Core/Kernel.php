@@ -14,6 +14,7 @@ use Rajled\AiAdsOs\Dashboard\DashboardPage;
 use Rajled\AiAdsOs\Engine\EngineRegistry;
 use Rajled\AiAdsOs\Health\HealthManager;
 use Rajled\AiAdsOs\Integration\GoogleAds\GoogleAdsServiceProvider;
+use Rajled\AiAdsOs\Integration\GoogleAds\Sdk\GoogleAdsAccountDiscovery;
 use Rajled\AiAdsOs\Integration\GoogleAds\Sdk\GoogleAdsConnectivityHealthCheck;
 use Rajled\AiAdsOs\Logging\Logger;
 use Rajled\AiAdsOs\Rest\RestController;
@@ -130,7 +131,8 @@ final class Kernel
                 return new DashboardPage(
                     $container->get(ConfigurationManager::class),
                     $container->get(HealthManager::class),
-                    $container->get(GoogleAdsConnectivityHealthCheck::class)
+                    $container->get(GoogleAdsConnectivityHealthCheck::class),
+                    $container->get(GoogleAdsAccountDiscovery::class)
                 );
             }
         );

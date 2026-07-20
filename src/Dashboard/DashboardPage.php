@@ -11,7 +11,10 @@ namespace Rajled\AiAdsOs\Dashboard;
 
 use Rajled\AiAdsOs\Config\ConfigurationManager;
 use Rajled\AiAdsOs\Health\HealthManager;
+use Rajled\AiAdsOs\Integration\GoogleAds\Account\AccessibleGoogleAdsAccount;
+use Rajled\AiAdsOs\Integration\GoogleAds\Sdk\GoogleAdsAccountDiscovery;
 use Rajled\AiAdsOs\Integration\GoogleAds\Sdk\GoogleAdsConnectivityHealthCheck;
+use Throwable;
 
 /**
  * Registers and renders the WordPress admin dashboard page.
@@ -26,20 +29,30 @@ final class DashboardPage
 
     private const CONNECTIVITY_NONCE_NAME = 'rajled_google_ads_connectivity_nonce';
 
+    private const ACCOUNT_DISCOVERY_ACTION = 'load_google_ads_accessible_accounts';
+
+    private const ACCOUNT_DISCOVERY_NONCE_ACTION = 'rajled_google_ads_account_discovery';
+
+    private const ACCOUNT_DISCOVERY_NONCE_NAME = 'rajled_google_ads_account_discovery_nonce';
+
     private ConfigurationManager $configuration;
 
     private HealthManager $healthManager;
 
     private GoogleAdsConnectivityHealthCheck $googleAdsConnectivityHealthCheck;
 
+    private GoogleAdsAccountDiscovery $googleAdsAccountDiscovery;
+
     public function __construct(
         ConfigurationManager $configuration,
         HealthManager $healthManager,
-        GoogleAdsConnectivityHealthCheck $googleAdsConnectivityHealthCheck
+        GoogleAdsConnectivityHealthCheck $googleAdsConnectivityHealthCheck,
+        GoogleAdsAccountDiscovery $googleAdsAccountDiscovery
     ) {
         $this->configuration = $configuration;
         $this->healthManager = $healthManager;
         $this->googleAdsConnectivityHealthCheck = $googleAdsConnectivityHealthCheck;
+        $this->googleAdsAccountDiscovery = $googleAdsAccountDiscovery;
     }
 
     public function registerMenu(): void
@@ -63,6 +76,9 @@ final class DashboardPage
 
         $health = $this->healthManager->getStatus();
         $connectivityResult = $this->handleConnectivityRequest();
+        $accountDiscoveryResult = null === $connectivityResult
+            ? $this->handleAccountDiscoveryRequest()
+            : null;
         ?>
         <div class="wrap">
             <h1><?php echo esc_html($this->configuration->getPluginName()); ?></h1>
@@ -119,6 +135,49 @@ final class DashboardPage
                 submit_button(
                     esc_html__('Run connectivity test', 'rajled-ai-ads-os'),
                     'primary',
+                    'submit',
+                    false
+                );
+                ?>
+            </form>
+
+            <h2><?php echo esc_html__('Accessible Google Ads Accounts', 'rajled-ai-ads-os'); ?></h2>
+            <p>
+                <?php
+                echo esc_html__(
+                    'Load the accounts directly accessible to the configured Google Ads credentials.',
+                    'rajled-ai-ads-os'
+                );
+                ?>
+            </p>
+
+            <?php
+            if (is_array($accountDiscoveryResult)) {
+                $this->renderAccessibleAccounts($accountDiscoveryResult);
+            } elseif (false === $accountDiscoveryResult) {
+                $this->renderAccessibleAccounts(null);
+            }
+            ?>
+
+            <form
+                method="post"
+                action="<?php echo esc_url(admin_url('admin.php?page=' . self::MENU_SLUG)); ?>"
+            >
+                <?php
+                wp_nonce_field(
+                    self::ACCOUNT_DISCOVERY_NONCE_ACTION,
+                    self::ACCOUNT_DISCOVERY_NONCE_NAME
+                );
+                ?>
+                <input
+                    type="hidden"
+                    name="rajled_google_ads_account_discovery_action"
+                    value="<?php echo esc_attr(self::ACCOUNT_DISCOVERY_ACTION); ?>"
+                >
+                <?php
+                submit_button(
+                    esc_html__('Load accessible accounts', 'rajled-ai-ads-os'),
+                    'secondary',
                     'submit',
                     false
                 );
@@ -221,6 +280,97 @@ final class DashboardPage
             <th scope="row"><?php echo esc_html($label); ?></th>
             <td><?php echo esc_html((string) $value); ?></td>
         </tr>
+        <?php
+    }
+
+    /**
+     * Load accounts only for the protected account-discovery POST action.
+     *
+     * @return list<AccessibleGoogleAdsAccount>|false|null
+     */
+    private function handleAccountDiscoveryRequest(): array|false|null
+    {
+        if (! current_user_can('manage_options')) {
+            return null;
+        }
+
+        $requestMethod = isset($_SERVER['REQUEST_METHOD']) && is_string($_SERVER['REQUEST_METHOD'])
+            ? strtoupper(sanitize_text_field(wp_unslash($_SERVER['REQUEST_METHOD'])))
+            : '';
+
+        if ('POST' !== $requestMethod) {
+            return null;
+        }
+
+        $submittedAction = isset($_POST['rajled_google_ads_account_discovery_action'])
+            && is_string($_POST['rajled_google_ads_account_discovery_action'])
+            ? sanitize_key(wp_unslash($_POST['rajled_google_ads_account_discovery_action']))
+            : '';
+
+        if (self::ACCOUNT_DISCOVERY_ACTION !== $submittedAction) {
+            return null;
+        }
+
+        check_admin_referer(
+            self::ACCOUNT_DISCOVERY_NONCE_ACTION,
+            self::ACCOUNT_DISCOVERY_NONCE_NAME
+        );
+
+        try {
+            return $this->googleAdsAccountDiscovery->discover();
+        } catch (Throwable) {
+            return false;
+        }
+    }
+
+    /**
+     * Render a read-only list of accessible Google Ads accounts.
+     *
+     * @param list<AccessibleGoogleAdsAccount>|null $accounts Accessible accounts or null on failure.
+     */
+    private function renderAccessibleAccounts(?array $accounts): void
+    {
+        ?>
+        <table class="widefat striped" style="max-width: 720px;">
+            <thead>
+                <tr>
+                    <th scope="col"><?php echo esc_html__('Customer ID', 'rajled-ai-ads-os'); ?></th>
+                    <th scope="col"><?php echo esc_html__('Resource Name', 'rajled-ai-ads-os'); ?></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (null === $accounts) : ?>
+                    <tr>
+                        <td colspan="2">
+                            <?php
+                            echo esc_html__(
+                                'Accessible Google Ads accounts could not be loaded.',
+                                'rajled-ai-ads-os'
+                            );
+                            ?>
+                        </td>
+                    </tr>
+                <?php elseif (array() === $accounts) : ?>
+                    <tr>
+                        <td colspan="2">
+                            <?php
+                            echo esc_html__(
+                                'No accessible Google Ads accounts were found.',
+                                'rajled-ai-ads-os'
+                            );
+                            ?>
+                        </td>
+                    </tr>
+                <?php else : ?>
+                    <?php foreach ($accounts as $account) : ?>
+                        <tr>
+                            <td><?php echo esc_html($account->getCustomerId()); ?></td>
+                            <td><?php echo esc_html($account->getResourceName()); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </tbody>
+        </table>
         <?php
     }
 
