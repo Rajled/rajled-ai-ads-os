@@ -281,8 +281,66 @@ A release is not complete until its Release Notes have been prepared and reviewe
 
 ## Highlights
 
-Sprint S1-005 introduced the first Integration → Domain bridge.
+Sprints S1-005 through S1-007 established the first operational Google Ads integration and account workflow.
 
 The system now supports provider-independent mapping from normalized integration data into the Domain model while maintaining complete isolation from the Google Ads SDK.
 
-Implementation of the first SDK reader has intentionally been deferred until the official Google Ads SDK is installed and verified.
+Composer now manages the official Google Ads PHP SDK v33.5.0 on PHP 8.3 or newer. Production WordPress packages contain locked Composer dependencies, so production hosting does not require Composer.
+
+## Google Ads Connectivity
+
+Administrators can run an explicit read-only connectivity test from the WordPress dashboard.
+
+The connectivity flow:
+
+- validates required credential categories;
+- constructs the native SDK client through the Integration boundary;
+- calls only `ListAccessibleCustomers`;
+- displays sanitized status and accessible-account count;
+- performs no network request during an ordinary dashboard GET.
+
+Google Ads credentials remain outside the repository and are supplied through constants defined by the WordPress host.
+
+## Account Discovery and Selection
+
+This release introduces the first production-accepted Google Ads account discovery and selection workflow.
+
+New capabilities include:
+
+- directly accessible account discovery;
+- account descriptive-name retrieval;
+- Manager / Client classification;
+- manager hierarchy discovery;
+- administrator active-account selection;
+- validated persistent account storage;
+- deterministic discovery across multiple directly accessible roots;
+- explicit partial discovery when individual roots are inaccessible.
+
+Recoverable root-level permission failures are isolated while systemic failures continue to fail fast. Managers remain visible but unselectable, and only a freshly rediscovered client candidate can be persisted.
+
+## WordPress Acceptance
+
+Acceptance testing confirmed:
+
+- live read-only Google Ads connectivity;
+- seven directly accessible roots returned by the connectivity operation;
+- four usable accounts displayed after three cancelled roots were omitted;
+- one manager visible and unselectable;
+- three clients available for selection;
+- active-account persistence after page refresh;
+- no credential or failed-root identifier exposure.
+
+## Architecture
+
+- WordPress remains the runtime host and presentation adapter, not the business architecture.
+- Application account contracts remain provider-neutral.
+- Domain remains independent from Google Ads and WordPress.
+- Official SDK types remain under `src/Integration/GoogleAds/Sdk/`.
+- Active-account persistence is isolated behind an Application contract.
+- Partial discovery uses explicit immutable result models and no hidden mutable state.
+
+## Current Limitations
+
+This release does not implement campaign retrieval, metrics retrieval, Google Ads mutations, scheduling, or business engines.
+
+WordPress acceptance tests for connectivity, discovery, partial recovery, selection, and persistence completed successfully.

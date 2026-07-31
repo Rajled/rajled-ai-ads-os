@@ -26,7 +26,7 @@ Detailed architectural specifications are maintained separately within the Docum
 
 RajLED AI Ads OS is designed as an AI-powered Digital Advertising Operations Platform.
 
-The system is based on independent business engines connected through clearly defined contracts.
+The system is evolving toward independent business engines connected through provider-neutral contracts. The current implementation provides the platform foundation, Domain models, Google Ads connectivity, and account discovery and selection workflows.
 
 The architecture prioritizes:
 
@@ -43,6 +43,8 @@ The project follows the principle:
 ---
 
 # High-Level Architecture
+
+The following diagram represents the planned engine architecture. The engines shown are roadmap components and are not yet implemented.
 
 ```text
 External Advertising Platform
@@ -104,13 +106,30 @@ Detailed engineering rules are defined in:
 
 The system is organized into multiple logical layers.
 
+## Core Layer
+
+Core owns application composition and lifecycle through the Kernel, service container, provider registry, health services, and engine registry.
+
+## Application Layer
+
+Application owns provider-neutral account discovery and selection contracts and services.
+
+Implemented account components include:
+
+* `AccountCandidate`
+* `AccountDiscoveryResult`
+* `DiscoveryCompleteness`
+* `AccountCatalogInterface`
+* `AccountSelectionService`
+* `ActiveAccountStoreInterface`
+
 ## Integration Layer
 
 Responsible for communication with external providers.
 
 Current provider:
 
-* Google Ads - configuration, credentials, client and connection readiness foundation
+* Google Ads - configuration, native SDK client construction, live read-only connectivity, account discovery, account details, hierarchy traversal, mapping, and partial discovery
 
 Future providers may include:
 
@@ -119,38 +138,37 @@ Future providers may include:
 * Amazon Ads
 * LinkedIn Ads
 
-Business engines never communicate directly with external APIs.
+Business engines must never communicate directly with external APIs.
 
 Integration providers are registered through a shared IntegrationRegistry. Provider-specific integrations expose readiness through IntegrationProviderInterface so application services can report integration health without depending on individual providers.
 
-Google Ads SDK-specific adapter code is isolated under `src/Integration/GoogleAds/Sdk/`. Other layers depend on integration contracts and factories instead of official SDK classes.
+Google Ads uses Composer and `googleads/google-ads-php` v33.5.0 with API V24. SDK-specific code and official SDK types are isolated under `src/Integration/GoogleAds/Sdk/`.
 
-The current Google Ads Integration Layer foundation does not perform live API requests, GAQL queries or campaign fetching. It prepares provider-specific services that future sprints can use behind integration-layer contracts.
+The integration performs explicit administrator-initiated read-only operations for connectivity and account discovery. It translates provider data into integration-owned DTOs and provider-neutral Application models. Ordinary dashboard GET requests do not perform network operations.
+
+Campaign retrieval, metrics retrieval, and Google Ads mutations are not implemented.
 
 ---
 
 ## Domain Layer
 
-Contains the business model.
+Contains the provider-independent business model.
 
-Examples:
+Implemented models:
 
 * Campaign
-* Ad Group
-* Keyword
-* Budget
-* Recommendation
-* Snapshot
+* Metrics
+* Common Value Objects
 
-The domain model is independent of infrastructure.
+The Domain model is independent of Google Ads, WordPress, Integration, REST, and infrastructure. Future entities are introduced only when their business requirements are implemented.
 
 ---
 
 ## Engine Layer
 
-Business functionality is implemented as independent engines.
+Future business functionality will be implemented as independent engines.
 
-Current engine roadmap:
+Planned engine roadmap:
 
 * Snapshot Engine
 * Campaign Memory Engine
@@ -161,20 +179,28 @@ Current engine roadmap:
 * Execution Engine
 * Learning Engine
 
-Each engine owns a single responsibility.
+No roadmap engine is described as completed in the current release.
+
+---
+
+## Infrastructure Layer
+
+Infrastructure contains runtime-specific implementations of Application contracts. The current `GoogleAdsActiveAccountStore` persists validated, non-secret active-account data in a non-autoloaded WordPress option.
 
 ---
 
 ## Presentation Layer
 
-Provides administrative access to the platform.
+WordPress is the current runtime host and presentation adapter. It is not the business architecture of the platform.
 
-Includes:
+Currently implemented presentation includes:
 
 * Dashboard
-* AI Control Center
-* REST API
-* Administrative Interface
+* REST health endpoint
+* Google Ads Connectivity panel
+* Google Ads Account panel
+
+Network operations require explicit administrator POST actions protected by capability and nonce checks. Presentation receives composed services and does not create native SDK clients.
 
 ---
 
@@ -184,12 +210,11 @@ The complete architecture is documented within the Documentation Suite.
 
 Primary architectural documents include:
 
-* DOC-001 Product Vision
-* DOC-002 System Architecture
-* DOC-003 Domain Model
-* DOC-004 Data Model
-* DOC-005 Engine Specifications
-* REST API Specification
+* [DOC-002 System Architecture](documentation/architecture/DOC-002-System-Architecture.md)
+* [DOC-003 Domain Model](documentation/architecture/DOC-003-DOMAIN-MODEL.md)
+* [DOC-004 Data Model](documentation/architecture/DOC-004-Data-Model.md)
+* [DOC-005 Engine Specification](documentation/architecture/DOC-005-Engine-Specification.md)
+* [DOC-006 REST API](documentation/api/DOC-006-REST-API.md)
 
 Architecture decisions are documented separately as ADR.
 
@@ -197,22 +222,17 @@ Architecture decisions are documented separately as ADR.
 
 # Dependency Direction
 
-The preferred dependency flow is:
+The dependency rules are:
 
 ```text
-Infrastructure
-        │
-        ▼
-Integration Layer
-        │
-        ▼
-Application
-        │
-        ▼
-Domain
+Domain <- Application
+Application contracts <- Integration implementations
+Application contracts <- Infrastructure implementations
+Application services <- Presentation
+Core -> runtime composition
 ```
 
-Business logic must never depend directly on infrastructure.
+Domain depends on no provider or framework. Application remains provider-neutral. Integration and Infrastructure depend inward on stable contracts. Native SDK types remain inside the Google Ads SDK boundary.
 
 ---
 
@@ -235,12 +255,12 @@ Architecture is considered part of the released product.
 
 Related documents:
 
-* README.md
-* ENGINEERING_STANDARDS.md
-* AGENTS.md
-* Documentation Suite
-* ADR
-* Technical Discovery
+* [README](README.md)
+* [System Architecture](documentation/architecture/DOC-002-System-Architecture.md)
+* [Engineering Standards](ENGINEERING_STANDARDS.md)
+* [Agent Instructions](AGENTS.md)
+* [Sprint S1-006](documentation/sprints/SPR-006.md)
+* [Sprint S1-007](documentation/sprints/SPR-007.md)
 
 ---
 

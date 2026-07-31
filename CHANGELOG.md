@@ -250,3 +250,86 @@ This changelog evolves together with the product and serves as the official hist
 ### Deferred
 
 - Google Ads SDK Campaign Reader moved to Sprint S1-006 pending official SDK integration.
+
+## Sprint S1-006 - Google Ads SDK and Connectivity
+
+### Added
+
+- Composer project bootstrap and locked production dependency management.
+- Official `googleads/google-ads-php` v33.5.0 dependency with API V24 support.
+- Native `GoogleAdsSdkFactory` and `GoogleAdsSdkClient` implementation.
+- Read-only `GoogleAdsConnectivityChecker` using `ListAccessibleCustomers`.
+- WordPress credential bridge for constants defined outside the repository.
+- Local OAuth refresh-token generation tool for development use.
+- Administrator-only Google Ads Connectivity Health Panel.
+- Production ZIP deployment process containing `vendor/`.
+
+### Changed
+
+- Raised the minimum runtime from PHP 8.1 to PHP 8.3.
+- Moved Google Ads from its pre-connectivity setup to verified live read-only connectivity.
+- Required complete release ZIP packages on WordPress hosts without Composer.
+
+### Security
+
+- Kept credential values outside plugin source and WordPress options.
+- Limited connectivity verification to one explicit `ListAccessibleCustomers` request.
+- Sanitized missing-configuration and SDK failure output.
+
+### Architecture
+
+- Preserved the custom project SPL autoloader while Composer manages third-party libraries.
+- Isolated official SDK construction and native types under `src/Integration/GoogleAds/Sdk/`.
+- Verified the production flow from configuration through the SDK boundary.
+
+### Documentation
+
+- Added Sprint S1-006 completion documentation.
+- Documented Composer deployment, OAuth setup, hosting installation, and live connectivity acceptance.
+
+
+## Sprint S1-007 — Google Ads Account Discovery and Selection
+
+### Added
+
+- Google Ads account discovery using CustomerService.ListAccessibleCustomers.
+- Google Ads account details discovery.
+- Google Ads account type detection (Manager / Client).
+- Google Ads account selection panel.
+- Active account persistence.
+- Immutable AccountDiscoveryResult model.
+- DiscoveryCompleteness model.
+- GoogleAdsAccountDetailsDiscoveryResult.
+- GoogleAdsAccountDiscoveryFailurePolicy.
+
+### Changed
+
+- Google Ads account discovery now supports partial discovery.
+- Cancelled or inaccessible root accounts no longer abort the complete discovery process.
+- Active client and manager accounts continue to be discovered when possible.
+- Active account selection now performs fresh canonical discovery before persistence.
+
+### Fixed
+
+- Fixed production failure caused by cancelled directly accessible Google Ads accounts returning PERMISSION_DENIED during root account queries.
+- Preserved deterministic account discovery after recoverable root failures.
+- Preserved active account selection semantics after partial discovery.
+
+### Security
+
+- Partial discovery logs remain sanitized.
+- No Customer IDs from failed roots are logged.
+- Native SDK objects remain isolated inside the Integration SDK layer.
+
+### Architecture
+
+- Introduced provider-neutral Application account contracts and immutable discovery results.
+- Kept Google Ads DTOs, readers, failure policy, and SDK types in Integration.
+- Isolated WordPress option persistence behind `ActiveAccountStoreInterface`.
+- Required fresh canonical discovery before active-account persistence.
+
+### Documentation
+
+- Added Sprint S1-007 completion and acceptance documentation.
+- Added the long-term DOC-002 System Architecture asset.
+- Updated architecture and project entry points through the accepted S1-007 implementation.

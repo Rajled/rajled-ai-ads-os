@@ -2,7 +2,7 @@
 
 > **AI-powered Digital Advertising Operations Platform**
 
-**Version:** 0.2.0-alpha.1 (Infrastructure Layer)
+**Version:** 0.2.0-alpha.4 (Google Ads Integration)
 **Status:** In Development
 **Repository Type:** Private
 **License:** Proprietary (RajLED)
@@ -15,7 +15,9 @@ RajLED AI Ads OS is an AI-powered operations platform designed to analyze, optim
 
 Unlike traditional Google Ads management tools, AI Ads OS is **not built around the Google Ads interface**. Instead, it creates its own business model, knowledge layer and decision process, allowing the platform to remain independent from vendor-specific APIs.
 
-The first supported advertising platform is Google Ads.
+The first supported advertising platform is Google Ads. 
+
+Google Ads is currently the only implemented provider. The platform architecture is intentionally provider-neutral so additional advertising platforms can be integrated without changing the business or application layers.
 
 The architecture has been designed to support additional advertising platforms in future releases without modifying the business engines.
 
@@ -49,40 +51,38 @@ The system follows the engineering principle:
 
 Current release:
 
-**v0.2.0-alpha.1 Infrastructure Layer**
+**v0.2.0-alpha.4 Google Ads Integration**
 
 Current milestone:
 
 **M1 - Foundation Platform**
 
-Current sprint:
+Latest accepted sprint:
 
-**Sprint 1 – Foundation**
+**S1-007 - Google Ads Account Discovery and Selection**
 
 Current implementation phase:
 
-* Architecture completed
-* Documentation Suite established
-* Repository initialization
-* Engineering standards preparation
-* WordPress plugin foundation created
-* REST and dashboard foundation created
-* Infrastructure service container created
-* Internal event dispatcher created
-* Google Ads Integration Layer foundation created
-* Integration Provider Framework created
-* Google Ads SDK Isolation layer created
-* Domain Layer skeleton created
+* Core service container, provider registry, REST health, and dashboard foundation
+* Provider-independent Domain foundation with Campaign and Metrics models
+* Provider-neutral Application account contracts and selection service
+* Composer-managed production dependencies on PHP 8.3 or newer
+* Official Google Ads PHP SDK v33.5.0 using API V24
+* External WordPress credential bridge and native SDK client factory
+* Live read-only Google Ads connectivity through `ListAccessibleCustomers`
+* Accessible-account names and Manager / Client classification
+* Explicit partial discovery for independently inaccessible roots
+* Administrator account selection with validated WordPress persistence
 
-Implementation of advertising business functionality has not started yet. The current Domain work is architectural only and contains no business logic.
+The first operational account workflow is implemented and accepted. Campaign retrieval, metrics retrieval, advertising mutations, and business engines remain future work.
 
 ---
 
 # Architecture
 
-The platform is based on independent business engines.
+The platform is designed around independent business engines.
 
-High-level architecture:
+Target engine architecture (planned; the engines shown below are not yet implemented):
 
 ```text
 External Advertising Platform
@@ -148,14 +148,13 @@ Project documentation is maintained alongside the source code.
 
 Documentation Suite currently includes:
 
-* Product Vision
-* System Architecture
-* Domain Model
-* Data Model
-* Engine Specifications
-* REST API Specification
-* Architecture Decision Records
-* Technical Discovery documents
+* [System Architecture](documentation/architecture/DOC-002-System-Architecture.md)
+* [Domain Model](documentation/architecture/DOC-003-DOMAIN-MODEL.md)
+* [Data Model](documentation/architecture/DOC-004-Data-Model.md)
+* [Engine Specification](documentation/architecture/DOC-005-Engine-Specification.md)
+* [REST API Specification](documentation/api/DOC-006-REST-API.md)
+* [Sprint Documentation](documentation/sprints/)
+* [Sprint Retrospectives](documentation/RETROSPECTIVES.md)
 
 Documentation is treated as a first-class project artifact.
 
@@ -168,18 +167,26 @@ Code is never considered complete until the corresponding documentation has been
 ```text
 documentation/
 src/
+  Application/
   Core/
   Config/
   Dashboard/
   Domain/
   Engine/
   Health/
+  Infrastructure/
   Integration/
+    Contract/
+    GoogleAds/
+      Account/
+      Mapping/
+      Sdk/
   Logging/
   Rest/
-tests/
 vendor/
 
+composer.json
+composer.lock
 rajled-ai-ads-os.php
 README.md
 AGENTS.md
@@ -227,17 +234,21 @@ Every sprint produces a working software release.
 
 Current technology stack:
 
-* PHP 8.x
-* WordPress
-* Composer
-* REST API
+* PHP 8.3 or newer
+* WordPress plugin runtime and administration adapter
+* Composer production dependency management
+* Google Ads PHP SDK v33.5.0
+* Google Ads API V24
+* WordPress REST API health endpoint
 * Git
 * GitHub
 * Codex-assisted development
 
 Planned Technology Stack: 
 
-* Google Ads API (planned)
+* Additional advertising provider SDKs
+* Advertising data storage and scheduled processing
+* AI model integrations
 
 Future integrations may include:
 
@@ -288,10 +299,20 @@ Google Ads Integration Layer foundation services:
 * GoogleAdsSdkFactory
 * GoogleAdsSdkClient
 * GoogleAdsSdkException
+* GoogleAdsConnectivityChecker
+* GoogleAdsConnectivityHealthCheck
+* GoogleAdsAccountDiscovery
+* GoogleAdsAccountDetailsReader
+* GoogleAdsAccountCatalog
+* GoogleAdsAccountMapper
 
 Core services are registered through service providers and resolved through the ServiceContainer.
 
-The Kernel is responsible for loading providers and connecting WordPress adapters such as REST endpoints and the admin dashboard. Integration providers register themselves in IntegrationRegistry so health reporting can include provider readiness without depending on provider-specific classes. Google Ads SDK-specific adapter logic is isolated under `src/Integration/GoogleAds/Sdk/`. The Google Ads foundation reports readiness only; it does not fetch campaigns or call the Google Ads API.
+The Kernel loads providers and connects WordPress adapters such as REST endpoints, the dashboard, and active-account persistence. Integration providers register themselves in IntegrationRegistry so health reporting remains provider-neutral.
+
+Google Ads SDK-specific logic is isolated under `src/Integration/GoogleAds/Sdk/`. The integration performs explicit, administrator-initiated read-only connectivity and account-discovery requests. Provider responses are translated into integration-owned DTOs and provider-neutral Application models before reaching selection and persistence workflows.
+
+Ordinary dashboard GET requests do not call Google Ads. Campaign retrieval, metrics retrieval, and mutate operations are not implemented.
 
 ---
 
