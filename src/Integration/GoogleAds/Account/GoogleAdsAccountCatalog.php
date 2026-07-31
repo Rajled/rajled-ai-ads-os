@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Rajled\AiAdsOs\Integration\GoogleAds\Account;
 
+use Rajled\AiAdsOs\Application\Account\AccountDiscoveryResult;
 use Rajled\AiAdsOs\Application\Account\AccountCatalogInterface;
 use Rajled\AiAdsOs\Integration\GoogleAds\GoogleAdsConfiguration;
 use Rajled\AiAdsOs\Integration\GoogleAds\Mapping\Exception\InvalidGoogleAdsMappingDataException;
@@ -36,10 +37,11 @@ final class GoogleAdsAccountCatalog implements AccountCatalogInterface
         $this->configuration = $configuration;
     }
 
-    public function discover(): array
+    public function discover(): AccountDiscoveryResult
     {
+        $detailsResult = $this->detailsReader->discover();
         $accountsByCustomerId = $this->deduplicate(
-            $this->detailsReader->discover(),
+            $detailsResult->getDetails(),
             $this->configuration->getLoginCustomerId()
         );
         $accounts = array();
@@ -50,7 +52,11 @@ final class GoogleAdsAccountCatalog implements AccountCatalogInterface
             $accounts[] = $this->accountMapper->map($details);
         }
 
-        return $accounts;
+        return new AccountDiscoveryResult(
+            $accounts,
+            $detailsResult->getUnavailableRootCount(),
+            $detailsResult->getCompleteness()
+        );
     }
 
     /**

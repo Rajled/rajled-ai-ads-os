@@ -13,8 +13,10 @@ use Google\Ads\GoogleAds\V24\Resources\Customer;
 use Google\Ads\GoogleAds\V24\Resources\CustomerClient;
 use Google\Ads\GoogleAds\V24\Services\GoogleAdsRow;
 use Google\Ads\GoogleAds\V24\Services\SearchGoogleAdsRequest;
+use Rajled\AiAdsOs\Application\Account\DiscoveryCompleteness;
 use Rajled\AiAdsOs\Integration\GoogleAds\Account\AccessibleGoogleAdsAccount;
 use Rajled\AiAdsOs\Integration\GoogleAds\Account\GoogleAdsAccountDetails;
+use Rajled\AiAdsOs\Integration\GoogleAds\Account\GoogleAdsAccountDetailsDiscoveryResult;
 use Throwable;
 
 /**
@@ -42,41 +44,95 @@ final class GoogleAdsAccountDetailsReader
 
     private GoogleAdsSdkFactory $clientFactory;
 
+    private GoogleAdsAccountDiscoveryFailurePolicy $failurePolicy;
+
     public function __construct(
         GoogleAdsAccountDiscovery $accountDiscovery,
-        GoogleAdsSdkFactory $clientFactory
+        GoogleAdsSdkFactory $clientFactory,
+        GoogleAdsAccountDiscoveryFailurePolicy $failurePolicy
     ) {
         $this->accountDiscovery = $accountDiscovery;
         $this->clientFactory = $clientFactory;
+        $this->failurePolicy = $failurePolicy;
     }
 
-    /**
-     * @return list<GoogleAdsAccountDetails>
-     */
-    public function discover(): array
+    public function discover(): GoogleAdsAccountDetailsDiscoveryResult
     {
         $rootAccounts = $this->accountDiscovery->discover();
+
+        if (array() === $rootAccounts) {
+            return new GoogleAdsAccountDetailsDiscoveryResult(
+                array(),
+                0,
+                DiscoveryCompleteness::EMPTY
+            );
+        }
+
         $details = array();
+        $unavailableRootCount = 0;
 
         foreach ($rootAccounts as $rootAccount) {
-            $rootClient = $this->requireClient(
-                $this->clientFactory->createForLoginCustomerId(
-                    $rootAccount->getCustomerId()
-                )
-            );
-            $rootDetails = $this->readRootAccount($rootClient, $rootAccount);
-            $details[] = $rootDetails;
+            try {
+                $rootClient = $this->requireClient(
+                    $this->clientFactory->createForLoginCustomerId(
+                        $rootAccount->getCustomerId()
+                    )
+                );
+                $rootDetails = $this->readRootAccount($rootClient, $rootAccount);
+                $details[] = $rootDetails;
 
-            if (! $rootDetails->isManager()) {
+                if (! $rootDetails->isManager()) {
+                    continue;
+                }
+
+                foreach (
+                    $this->readManagerHierarchy($rootClient, $rootDetails) as $clientDetails
+                ) {
+                    $details[] = $clientDetails;
+                }
+            } catch (GoogleAdsSdkException $exception) {
+                if (! $this->failurePolicy->isRecoverableRootFailure($exception)) {
+                    throw $exception;
+                }
+
+                $unavailableRootCount = $this->incrementUnavailableRootCount(
+                    $unavailableRootCount
+                );
                 continue;
-            }
-
-            foreach ($this->readManagerHierarchy($rootClient, $rootDetails) as $clientDetails) {
-                $details[] = $clientDetails;
             }
         }
 
-        return $details;
+        if (array() === $details) {
+            throw new GoogleAdsSdkException(
+                'Google Ads account discovery did not return any usable accounts.',
+                0,
+                null,
+                array(
+                    'sdk_failure_stage'    => GoogleAdsSdkException::STAGE_ROOT_ACCOUNT_QUERY,
+                    'sdk_failure_category' => GoogleAdsSdkException::CATEGORY_PERMISSION_ACCESS,
+                )
+            );
+        }
+
+        return new GoogleAdsAccountDetailsDiscoveryResult(
+            $details,
+            $unavailableRootCount,
+            0 === $unavailableRootCount
+                ? DiscoveryCompleteness::COMPLETE
+                : DiscoveryCompleteness::PARTIAL
+        );
+    }
+
+    private function incrementUnavailableRootCount(int $unavailableRootCount): int
+    {
+        if (PHP_INT_MAX === $unavailableRootCount) {
+            throw $this->responseException(
+                'Google Ads returned too many unavailable account roots.',
+                GoogleAdsSdkException::STAGE_ROOT_ACCOUNT_QUERY
+            );
+        }
+
+        return $unavailableRootCount + 1;
     }
 
     private function requireClient(?GoogleAdsSdkClient $client): GoogleAdsSdkClient

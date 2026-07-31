@@ -32,8 +32,9 @@ final class AccountSelectionService
     public function select(Identifier $identifier): AccountCandidate
     {
         $selectedAccount = null;
+        $discoveryResult = $this->accountCatalog->discover();
 
-        foreach ($this->accountCatalog->discover() as $candidate) {
+        foreach ($discoveryResult->getAccounts() as $candidate) {
             if (! $candidate instanceof AccountCandidate) {
                 throw new InvalidAccountSelectionException(
                     'Account discovery returned invalid selection data.'

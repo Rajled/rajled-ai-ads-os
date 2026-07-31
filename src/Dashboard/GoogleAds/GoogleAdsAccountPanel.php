@@ -11,6 +11,7 @@ namespace Rajled\AiAdsOs\Dashboard\GoogleAds;
 
 use Rajled\AiAdsOs\Application\Account\AccountCandidate;
 use Rajled\AiAdsOs\Application\Account\AccountCatalogInterface;
+use Rajled\AiAdsOs\Application\Account\AccountDiscoveryResult;
 use Rajled\AiAdsOs\Application\Account\AccountSelectionService;
 use Rajled\AiAdsOs\Application\Account\ActiveAccountStoreInterface;
 use Rajled\AiAdsOs\Application\Account\Exception\ActiveAccountStorageException;
@@ -106,7 +107,7 @@ final class GoogleAdsAccountPanel
             $this->renderAccountSelectionResult($accountSelectionResult);
         }
 
-        if (is_array($accountDiscoveryResult)) {
+        if ($accountDiscoveryResult instanceof AccountDiscoveryResult) {
             $this->renderAccessibleAccounts(
                 $accountDiscoveryResult,
                 $activeAccount,
@@ -142,9 +143,9 @@ final class GoogleAdsAccountPanel
     }
 
     /**
-     * @return list<AccountCandidate>|false|null
+     * @return AccountDiscoveryResult|false|null
      */
-    private function handleAccountDiscoveryRequest(): array|false|null
+    private function handleAccountDiscoveryRequest(): AccountDiscoveryResult|false|null
     {
         if (! current_user_can('manage_options')) {
             return null;
@@ -169,7 +170,20 @@ final class GoogleAdsAccountPanel
         );
 
         try {
-            return $this->accountCatalog->discover();
+            $result = $this->accountCatalog->discover();
+
+            if ($result->isPartial()) {
+                $this->logger->warning(
+                    'Google Ads account discovery completed with unavailable roots.',
+                    array(
+                        'operation'              => 'google_ads_account_discovery',
+                        'outcome'                => 'partial',
+                        'unavailable_root_count' => $result->getUnavailableRootCount(),
+                    )
+                );
+            }
+
+            return $result;
         } catch (GoogleAdsSdkException $exception) {
             $this->logFailure(
                 'Google Ads account discovery failed.',
@@ -350,15 +364,25 @@ final class GoogleAdsAccountPanel
         <?php
     }
 
-    /**
-     * @param list<AccountCandidate>|null $accounts
-     */
     private function renderAccessibleAccounts(
-        ?array $accounts,
+        ?AccountDiscoveryResult $result,
         ?AccountCandidate $activeAccount,
         string $formAction
     ): void {
+        $accounts = null === $result ? null : $result->getAccounts();
         ?>
+        <?php if (null !== $result && $result->isPartial()) : ?>
+            <div class="notice notice-warning inline">
+                <p>
+                    <?php
+                    echo esc_html__(
+                        'Some directly accessible Google Ads accounts could not be loaded and were omitted.',
+                        'rajled-ai-ads-os'
+                    );
+                    ?>
+                </p>
+            </div>
+        <?php endif; ?>
         <table class="widefat striped" style="max-width: 720px;">
             <thead>
                 <tr>

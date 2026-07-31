@@ -16,6 +16,7 @@ use Rajled\AiAdsOs\Core\ServiceProviderInterface;
 use Rajled\AiAdsOs\Integration\GoogleAds\Account\GoogleAdsAccountCatalog;
 use Rajled\AiAdsOs\Integration\GoogleAds\Mapping\GoogleAdsAccountMapper;
 use Rajled\AiAdsOs\Integration\GoogleAds\Sdk\GoogleAdsAccountDiscovery;
+use Rajled\AiAdsOs\Integration\GoogleAds\Sdk\GoogleAdsAccountDiscoveryFailurePolicy;
 use Rajled\AiAdsOs\Integration\GoogleAds\Sdk\GoogleAdsAccountDetailsReader;
 use Rajled\AiAdsOs\Integration\GoogleAds\Sdk\GoogleAdsConnectivityChecker;
 use Rajled\AiAdsOs\Integration\GoogleAds\Sdk\GoogleAdsConnectivityHealthCheck;
@@ -66,11 +67,19 @@ final class GoogleAdsServiceProvider implements ServiceProviderInterface
         );
 
         $container->singleton(
+            GoogleAdsAccountDiscoveryFailurePolicy::class,
+            static function (): GoogleAdsAccountDiscoveryFailurePolicy {
+                return new GoogleAdsAccountDiscoveryFailurePolicy();
+            }
+        );
+
+        $container->singleton(
             GoogleAdsAccountDetailsReader::class,
             static function (ServiceContainer $container): GoogleAdsAccountDetailsReader {
                 return new GoogleAdsAccountDetailsReader(
                     $container->get(GoogleAdsAccountDiscovery::class),
-                    $container->get(GoogleAdsSdkFactory::class)
+                    $container->get(GoogleAdsSdkFactory::class),
+                    $container->get(GoogleAdsAccountDiscoveryFailurePolicy::class)
                 );
             }
         );

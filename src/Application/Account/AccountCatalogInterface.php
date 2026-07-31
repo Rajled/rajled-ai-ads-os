@@ -14,8 +14,5 @@ namespace Rajled\AiAdsOs\Application\Account;
  */
 interface AccountCatalogInterface
 {
-    /**
-     * @return list<AccountCandidate>
-     */
-    public function discover(): array;
+    public function discover(): AccountDiscoveryResult;
 }
